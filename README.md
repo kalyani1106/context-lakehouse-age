@@ -1,6 +1,6 @@
 # PDF → Context Lakehouse → Apache AGE Knowledge Graph Pipeline
 
-A modular, production-ready pipeline that automates document ingestion from raw PDFs into a structured Lakehouse abstraction, extracts entity and relationship context with page-level provenance, deduplicates canonical entities, and populates an **Apache AGE (PostgreSQL)** graph database for openCypher querying and interactive visual exploration.
+A modular end-to-end prototype that automates document ingestion from raw PDFs into a structured Lakehouse abstraction, extracts entity and relationship context with page-level provenance, deduplicates canonical entities, and populates an Apache AGE (PostgreSQL) graph database for openCypher querying and interactive visual exploration.
 
 ---
 
