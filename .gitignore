@@ -1,0 +1,91 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+env/
+venv/
+.venv/
+
+# Build / packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+
+# =========================
+# Lakehouse / Generated Data
+# =========================
+lakehouse_storage/
+lakehouse_data/
+test_storage_tier/
+test_lakehouse_storage/
+data/
+
+# Generated graph/context artifacts
+graph_sync/
+extracted_pages/
+chunks/
+context/
+
+
+# =========================
+# Environment / Secrets
+# =========================
+.env
+.env.*
+!.env.example
+
+
+# =========================
+# Testing / Cache
+# =========================
+.pytest_cache/
+.coverage
+htmlcov/
+
+
+# =========================
+# IDE
+# =========================
+.idea/
+.vscode/
+
+
+# =========================
+# OS
+# =========================
+.DS_Store
+Thumbs.db
+
+
+# =========================
+# Logs / Temporary files
+# =========================
+*.log
+logs/
+*.tmp
+*.temp
+
+
+# =========================
+# PDF files
+# =========================
+*.pdf
