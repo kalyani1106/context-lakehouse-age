@@ -152,18 +152,53 @@ pip install -r requirements.txt
 
 ### Option A: Run the FastAPI REST API
 ```bash
-python -m uvicorn api.app:app --host 0.0.0.0 --port 8000 --reload
+py -3.14 -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
 ```
-Interactive Swagger API documentation will be available at:
+Interactive Swagger API documentation is available at:
 `http://localhost:8000/docs`
 
 ### Option B: Run the Streamlit Interactive Dashboard
 ```bash
-streamlit run ui/app.py
+streamlit run frontend/app.py
 ```
 The web dashboard opens at `http://localhost:8501`.
 
 ---
+
+## 6. Project Directory Layout
+
+```text
+context-lakehouse/
+│
+├── backend/
+│   ├── __init__.py
+│   ├── main.py                  # FastAPI Application Entrypoint
+│   ├── config.py                # Environment and configuration settings
+│   ├── pipeline.py              # PDF -> Lakehouse -> Apache AGE Orchestrator
+│   ├── api/                     # REST API routes (PDF + Git Graphify)
+│   ├── graph/                   # Apache AGE client & graph service
+│   ├── context/                 # Semantic context & entity normalizer
+│   ├── extraction/              # PDF text extractor & document chunker
+│   ├── storage/                 # Lakehouse storage tiers & metadata catalog
+│   └── git_graph/               # Git Repository Knowledge Graph ("Graphify") subsystem
+│       ├── config.py
+│       ├── pipeline.py          # Git Clone -> Scan -> AST/Config -> AGE Ingestion
+│       ├── repository/          # Git clone, scanner, models
+│       ├── parsing/             # AST, JS/TS, Config, Markdown parsers
+│       ├── context/             # Entity extractor & normalizer
+│       └── graph/               # Git graph service & sample Cypher queries
+│
+├── frontend/
+│   ├── __init__.py
+│   ├── app.py                   # Streamlit Multi-Modal Dashboard
+│   ├── graph_visualizer.py      # Vis.js interactive graph visualizer & provenance inspector
+│   └── static/                  # Offline vis-network static assets
+│
+├── tests/                       # Complete automated test suite (42 tests)
+├── scripts/                     # Utility and demonstration scripts
+├── requirements.txt
+└── README.md
+```
 
 ## 6. REST API Reference
 

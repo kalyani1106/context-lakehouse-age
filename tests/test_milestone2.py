@@ -5,10 +5,10 @@ from pathlib import Path
 # Add project root to sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from extraction.pdf_extractor import PDFExtractor
-from extraction.chunker import DocumentChunker
-from context.extractor import ContextExtractor
-from context.schemas import DocumentContext
+from backend.extraction.pdf_extractor import PDFExtractor
+from backend.extraction.chunker import DocumentChunker
+from backend.context.extractor import ContextExtractor
+from backend.context.schemas import DocumentContext
 
 class TestMilestone2(unittest.TestCase):
     def setUp(self):

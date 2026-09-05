@@ -1,8 +1,8 @@
 import unittest
-from graph.age_client import AGEClient
-from graph.graph_service import GraphService
-from graph.agtype_parser import parse_agtype
-from context.schemas import DocumentContext, Entity, Relationship, Provenance
+from backend.graph.age_client import AGEClient
+from backend.graph.graph_service import GraphService
+from backend.graph.agtype_parser import parse_agtype
+from backend.context.schemas import DocumentContext, Entity, Relationship, Provenance
 
 class TestAGEGraph(unittest.TestCase):
     def setUp(self):

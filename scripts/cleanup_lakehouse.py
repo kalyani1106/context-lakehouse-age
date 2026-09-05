@@ -15,10 +15,10 @@ from datetime import datetime
 # Set path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from storage.lakehouse import LocalLakehouseStorageService
-from storage.models import ProcessingStatus
-from graph.age_client import AGEClient
-from graph.graph_service import GraphService
+from backend.storage.lakehouse import LocalLakehouseStorageService
+from backend.storage.models import ProcessingStatus
+from backend.graph.age_client import AGEClient
+from backend.graph.graph_service import GraphService
 
 def audit_and_cleanup(dry_run: bool = True):
     storage = LocalLakehouseStorageService()
@@ -132,7 +132,7 @@ def audit_and_cleanup(dry_run: bool = True):
     print("=" * 80)
 
     # Clean the graph and re-ingest clean canonical contexts
-    from pipeline import PDFContextPipeline
+    from backend.pipeline import PDFContextPipeline
     pipe = PDFContextPipeline()
     
     # Reset knowledge_graph

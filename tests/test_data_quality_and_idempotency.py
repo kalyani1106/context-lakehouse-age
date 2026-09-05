@@ -5,8 +5,8 @@ from pathlib import Path
 # Add project root to sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from pipeline import PDFContextPipeline
-from storage.models import ProcessingStatus
+from backend.pipeline import PDFContextPipeline
+from backend.storage.models import ProcessingStatus
 
 class TestDataQualityAndIdempotency(unittest.TestCase):
     def setUp(self):

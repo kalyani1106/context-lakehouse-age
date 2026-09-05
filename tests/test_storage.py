@@ -1,8 +1,8 @@
 import unittest
 import shutil
 from pathlib import Path
-from storage.lakehouse import LocalLakehouseStorageService
-from storage.models import ProcessingStatus, DocumentMetadata, LakehouseLayer
+from backend.storage.lakehouse import LocalLakehouseStorageService
+from backend.storage.models import ProcessingStatus, DocumentMetadata, LakehouseLayer
 
 class TestStorage(unittest.TestCase):
     def setUp(self):

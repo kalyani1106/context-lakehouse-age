@@ -5,10 +5,10 @@ from pathlib import Path
 # Add project root to sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from storage.lakehouse import LocalLakehouseStorageService
-from storage.models import ProcessingStatus
-from extraction.pdf_extractor import PDFExtractor
-from graph.age_client import AGEClient
+from backend.storage.lakehouse import LocalLakehouseStorageService
+from backend.storage.models import ProcessingStatus
+from backend.extraction.pdf_extractor import PDFExtractor
+from backend.graph.age_client import AGEClient
 
 class TestMilestone1(unittest.TestCase):
     def setUp(self):

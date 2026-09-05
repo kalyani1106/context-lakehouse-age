@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 # Add project root to sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from api.app import app
+from backend.api.app import app
 
 class TestMilestone4API(unittest.TestCase):
     def setUp(self):

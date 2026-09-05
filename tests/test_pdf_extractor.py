@@ -1,7 +1,7 @@
 import unittest
 from pathlib import Path
-from extraction.pdf_extractor import PDFExtractor, PDFExtractionError
-from extraction.chunker import DocumentChunker
+from backend.extraction.pdf_extractor import PDFExtractor, PDFExtractionError
+from backend.extraction.chunker import DocumentChunker
 
 class TestPDFExtractor(unittest.TestCase):
     def setUp(self):

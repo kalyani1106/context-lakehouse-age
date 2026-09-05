@@ -1,7 +1,7 @@
 import unittest
-from context.schemas import Entity, Relationship, Provenance, DocumentContext
-from context.normalizer import EntityNormalizer
-from context.extractor import ContextExtractor
+from backend.context.schemas import Entity, Relationship, Provenance, DocumentContext
+from backend.context.normalizer import EntityNormalizer
+from backend.context.extractor import ContextExtractor
 
 class TestContextExtractor(unittest.TestCase):
     def setUp(self):

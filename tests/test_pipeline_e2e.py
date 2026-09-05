@@ -1,7 +1,7 @@
 import unittest
 from pathlib import Path
-from pipeline import PDFContextPipeline
-from storage.models import ProcessingStatus
+from backend.pipeline import PDFContextPipeline
+from backend.storage.models import ProcessingStatus
 
 class TestPipelineE2E(unittest.TestCase):
     def setUp(self):

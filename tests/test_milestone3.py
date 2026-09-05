@@ -5,11 +5,11 @@ from pathlib import Path
 # Add project root to sys.path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from extraction.pdf_extractor import PDFExtractor
-from extraction.chunker import DocumentChunker
-from context.extractor import ContextExtractor
-from graph.age_client import AGEClient
-from graph.graph_service import GraphService
+from backend.extraction.pdf_extractor import PDFExtractor
+from backend.extraction.chunker import DocumentChunker
+from backend.context.extractor import ContextExtractor
+from backend.graph.age_client import AGEClient
+from backend.graph.graph_service import GraphService
 
 class TestMilestone3(unittest.TestCase):
     def setUp(self):
