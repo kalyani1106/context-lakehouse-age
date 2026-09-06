@@ -6,7 +6,7 @@ Parquet file tables, SHA-256 deduplication, and metadata cataloging. In producti
 with Delta Lake, Apache Iceberg, or Cloud Storage (S3/GCS/BigLake) without altering the pipeline contracts.
 
 Tier Architecture:
-- lakehouse_storage/
+- backend/lakehouse_storage/
   ├── raw/               (Original unmodified PDF binaries)
   ├── metadata/          (Document catalog & lifecycle state tracking)
   ├── extracted_pages/   (Page-level texts & metadata as Parquet & JSON)

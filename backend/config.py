@@ -21,7 +21,7 @@ class Settings(BaseModel):
     AGE_GRAPH_NAME: str = Field(default_factory=lambda: os.getenv("AGE_GRAPH_NAME", "knowledge_graph"))
     
     # Lakehouse Storage
-    LAKEHOUSE_ROOT: Path = Field(default_factory=lambda: Path(os.getenv("LAKEHOUSE_ROOT", "./lakehouse_storage")).resolve())
+    LAKEHOUSE_ROOT: Path = Field(default_factory=lambda: Path(os.getenv("LAKEHOUSE_ROOT", str(Path(__file__).resolve().parent / "lakehouse_storage"))).resolve())
     
     # Text Extraction & Chunking
     CHUNK_SIZE: int = Field(default_factory=lambda: int(os.getenv("CHUNK_SIZE", "800")))

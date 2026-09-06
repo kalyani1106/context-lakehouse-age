@@ -34,6 +34,7 @@ wheels/
 # Lakehouse / Generated Data
 # =========================
 lakehouse_storage/
+backend/lakehouse_storage/
 lakehouse_data/
 test_storage_tier/
 test_lakehouse_storage/

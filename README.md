@@ -63,7 +63,7 @@ A modular end-to-end prototype that automates document ingestion from raw PDFs i
 
 ### Lakehouse Directory Layout
 ```text
-lakehouse_storage/
+backend/lakehouse_storage/
 ├── raw/               # Original unmodified PDF binaries ({doc_id}.pdf)
 ├── metadata/          # Document lifecycle catalog ({doc_id}.json)
 ├── extracted_pages/   # Page-level text as Parquet & JSON ({doc_id}.parquet / .json)
@@ -118,7 +118,7 @@ POSTGRES_DB=postgres
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=postgres
 AGE_GRAPH_NAME=knowledge_graph
-LAKEHOUSE_ROOT=./lakehouse_storage
+LAKEHOUSE_ROOT=./backend/lakehouse_storage
 
 # LLM Extractor (Optional: uses High-Precision Heuristic NLP extractor if unset)
 LLM_PROVIDER=auto
@@ -272,7 +272,7 @@ python -m unittest discover -s tests -p "test_*.py"
 ## 9. Example End-to-End Walkthrough
 
 1. **Upload**: User uploads `A Report on Context Lakehouse.pdf`.
-2. **Lakehouse Storage**: Stored in `lakehouse_storage/raw/doc_xyz.pdf`, registered in `metadata/`.
+2. **Lakehouse Storage**: Stored in `backend/lakehouse_storage/raw/doc_xyz.pdf`, registered in `metadata/`.
 3. **Extraction**: `PDFExtractor` reads 12 pages (1,418 words) into `extracted_pages/`.
 4. **Chunking**: `DocumentChunker` splits text into 22 passage chunks in `chunks/`.
 5. **Context Generation**: `ContextExtractor` extracts 141 canonical entities (e.g. `Context Lakehouse`, `PostgreSQL`, `Apache AGE`, `Semantic Layer`, `DuckDB`) and 73 relationships (e.g. `Product -[:USES]-> Telemetry`, `Apache AGE -[:EXTENDS]-> PostgreSQL`).
