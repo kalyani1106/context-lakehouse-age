@@ -325,3 +325,133 @@ and deterministic extraction methods to enable complete code navigation.
         # Render XML with encoding declaration
         xml_str = ET.tostring(graphml, encoding="utf-8", method="xml").decode("utf-8")
         return f'<?xml version="1.0" encoding="UTF-8"?>\n{xml_str}'
+
+    def export_jpg(self, repo_name: Optional[str] = None) -> bytes:
+        """
+        Export graph visualization dynamically as a high-resolution JPEG image (.jpg)
+        matching the dark UI theme and entity color mappings.
+        """
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+        import matplotlib.patches as mpatches
+        import networkx as nx
+        from frontend.graph_visualizer import COLOR_MAP
+
+        raw = self._get_raw_graph_data(repo_name)
+        nodes = raw.get("nodes", [])
+        edges = raw.get("edges", [])
+        repo_display = repo_name or "Repository"
+
+        fig, ax = plt.subplots(figsize=(20, 12), facecolor="#0F172A")
+        ax.set_facecolor("#0F172A")
+
+        if not nodes:
+            ax.text(0.5, 0.5, f"No graph data available for {repo_display}", color="#94A3B8",
+                    ha="center", va="center", fontsize=18)
+            ax.axis("off")
+            buf = io.BytesIO()
+            plt.savefig(buf, format="jpeg", dpi=150, facecolor="#0F172A", bbox_inches="tight")
+            plt.close(fig)
+            return buf.getvalue()
+
+        G = nx.DiGraph()
+        node_colors = []
+        node_labels = {}
+
+        for n in nodes:
+            nid = n["id"]
+            props = n.get("properties") or {}
+            name = n.get("name") or props.get("name") or n.get("label") or props.get("canonical_id") or str(nid)
+            etype = n.get("entity_type") or props.get("entity_type") or n.get("label") or "Concept"
+            color = COLOR_MAP.get(etype, "#3B82F6")
+
+            disp_name = (name[:16] + "..") if len(name) > 18 else name
+            G.add_node(nid, label=disp_name, full_name=name, entity_type=etype, color=color)
+            node_colors.append(color)
+            node_labels[nid] = disp_name
+
+        for e in edges:
+            src = e.get("source")
+            tgt = e.get("target")
+            if src in G and tgt in G:
+                rel = e.get("relationship_type") or e.get("label") or "RELATED_TO"
+                G.add_edge(src, tgt, label=rel)
+
+        # Compute layout
+        if len(G.nodes) > 1:
+            try:
+                pos = nx.spring_layout(G, k=0.5 / (len(G.nodes) ** 0.3), iterations=60, seed=42)
+            except Exception:
+                pos = nx.circular_layout(G)
+        else:
+            pos = {list(G.nodes)[0]: (0.5, 0.5)}
+
+        # Draw Edges
+        if G.edges:
+            nx.draw_networkx_edges(
+                G, pos, ax=ax,
+                edge_color="#475569",
+                alpha=0.6,
+                arrows=True,
+                arrowsize=14,
+                arrowstyle="-|>",
+                connectionstyle="arc3,rad=0.08",
+                width=1.2
+            )
+
+        # Draw Nodes
+        colors = [G.nodes[n]["color"] for n in G.nodes]
+        nx.draw_networkx_nodes(
+            G, pos, ax=ax,
+            node_color=colors,
+            node_size=850,
+            edgecolors="#1E293B",
+            linewidths=1.5,
+            alpha=0.92
+        )
+
+        # Draw Labels with background box
+        for n_id, (x, y) in pos.items():
+            lbl = node_labels.get(n_id, "")
+            ax.text(
+                x, y, lbl,
+                fontsize=8.5,
+                fontweight="bold",
+                color="#FFFFFF",
+                ha="center",
+                va="center",
+                bbox=dict(boxstyle="round,pad=0.2", facecolor="#1E293B", edgecolor="none", alpha=0.75)
+            )
+
+        # Title & Metadata
+        title_text = f"{repo_display} — Knowledge Graph"
+        subtitle_text = f"Apache AGE Graph | {len(nodes)} Vertices | {len(edges)} Edges"
+        ax.text(0.02, 0.97, title_text, transform=ax.transAxes, color="#38BDF8", fontsize=18, fontweight="bold", va="top")
+        ax.text(0.02, 0.93, subtitle_text, transform=ax.transAxes, color="#94A3B8", fontsize=11, va="top")
+
+        # Legend
+        present_types = sorted(list(set(G.nodes[n]["entity_type"] for n in G.nodes)))
+        legend_patches = [
+            mpatches.Patch(color=COLOR_MAP.get(t, "#3B82F6"), label=t)
+            for t in present_types if t in COLOR_MAP
+        ]
+        if legend_patches:
+            legend = ax.legend(
+                handles=legend_patches,
+                loc="lower right",
+                facecolor="#1E293B",
+                edgecolor="#334155",
+                fontsize=9,
+                labelcolor="#F8FAFC",
+                title="Entity Types",
+                title_fontsize=10
+            )
+            legend.get_title().set_color("#38BDF8")
+
+        ax.axis("off")
+        buf = io.BytesIO()
+        plt.savefig(buf, format="jpeg", dpi=150, facecolor="#0F172A", edgecolor="none", bbox_inches="tight")
+        plt.close(fig)
+        return buf.getvalue()
+

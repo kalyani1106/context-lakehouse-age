@@ -581,7 +581,7 @@ with tab_git:
         st.markdown(f"### ⬇️ Download Knowledge Graph for `{selected_git_repo}`")
         st.caption("Download the complete Apache AGE knowledge graph with full line-level source code provenance in your preferred format:")
 
-        d_col1, d_col2, d_col3, d_col4 = st.columns(4)
+        d_col1, d_col2, d_col3, d_col4, d_col5 = st.columns(5)
         
         # Prepare exports safely in memory
         try:
@@ -589,6 +589,7 @@ with tab_git:
             json_str = json.dumps(json_export_data, indent=2)
             zip_bytes = export_service.export_zip(selected_git_repo)
             graphml_str = export_service.export_graphml(selected_git_repo)
+            jpg_bytes = export_service.export_jpg(selected_git_repo)
             clean_repo_name = selected_git_repo.replace(" ", "_").replace("/", "_")
 
             with d_col1:
@@ -634,6 +635,17 @@ with tab_git:
                     help="Standard XML GraphML format compatible with Gephi, Cytoscape, NetworkX, yEd."
                 )
                 st.caption("🌐 Compatible with Gephi & Cytoscape")
+
+            with d_col5:
+                st.download_button(
+                    label="🖼️ Download Knowledge Graph (JPG)",
+                    data=jpg_bytes,
+                    file_name=f"{clean_repo_name}_knowledge_graph.jpg",
+                    mime="image/jpeg",
+                    use_container_width=True,
+                    help="Download the Knowledge Graph visualization as a high-resolution JPG image."
+                )
+                st.caption("🖼️ High-resolution JPEG image")
 
         except Exception as e:
             st.error(f"Error preparing graph download: {e}")

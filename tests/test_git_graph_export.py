@@ -134,5 +134,30 @@ def runner():
         self.assertIn("attachment; filename=", res.headers["content-disposition"])
         self.assertIn("<graphml", res.text)
 
+    def test_10_export_jpg(self):
+        from PIL import Image
+        jpg_bytes = self.export_service.export_jpg(self.repo_name)
+        self.assertIsInstance(jpg_bytes, bytes)
+        self.assertGreater(len(jpg_bytes), 1000)
+
+        # Validate that it is a valid JPEG image
+        img = Image.open(io.BytesIO(jpg_bytes))
+        self.assertEqual(img.format, "JPEG")
+        self.assertEqual(img.mode, "RGB")
+        self.assertGreater(img.size[0], 500)
+        self.assertGreater(img.size[1], 300)
+
+    def test_11_api_export_jpg_endpoint(self):
+        from PIL import Image
+        res = self.client.get(f"/repositories/{self.repo_name}/export", params={"format": "jpg"})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.headers["content-type"], "image/jpeg")
+        self.assertIn("attachment; filename=", res.headers["content-disposition"])
+        self.assertIn(".jpg", res.headers["content-disposition"])
+
+        # Validate image content
+        img = Image.open(io.BytesIO(res.content))
+        self.assertEqual(img.format, "JPEG")
+
 if __name__ == "__main__":
     unittest.main()

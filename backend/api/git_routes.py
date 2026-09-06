@@ -98,10 +98,10 @@ def ask_repository_graph(repository_name: str, req: AskQuestionRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to process graph question: {str(e)}")
 
-@git_router.get("/{repository_name}/export", summary="Export knowledge graph in JSON, CSV, ZIP, or GraphML format")
+@git_router.get("/{repository_name}/export", summary="Export knowledge graph in JSON, CSV, ZIP, GraphML, or JPG format")
 def export_repository_graph(
     repository_name: str,
-    format: str = Query(default="json", pattern="^(json|csv|zip|graphml)$", description="Export format: json, csv, zip, or graphml"),
+    format: str = Query(default="json", pattern="^(json|csv|zip|graphml|jpg|jpeg)$", description="Export format: json, csv, zip, graphml, or jpg"),
     download: bool = Query(default=False, description="Set to true to trigger browser attachment download")
 ):
     """
@@ -143,6 +143,14 @@ def export_repository_graph(
                 content=graphml_str,
                 media_type="application/xml",
                 headers={"Content-Disposition": f'attachment; filename="{clean_name}_knowledge_graph.graphml"'}
+            )
+
+        elif format in ("jpg", "jpeg"):
+            jpg_bytes = export_service.export_jpg(repo_name=repository_name)
+            return Response(
+                content=jpg_bytes,
+                media_type="image/jpeg",
+                headers={"Content-Disposition": f'attachment; filename="{clean_name}_knowledge_graph.jpg"'}
             )
 
     except Exception as e:
