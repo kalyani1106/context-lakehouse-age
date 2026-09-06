@@ -37,7 +37,9 @@ lakehouse_storage/
 backend/lakehouse_storage/
 lakehouse_data/
 test_storage_tier/
+backend/test_storage_tier/
 test_lakehouse_storage/
+backend/test_lakehouse_storage/
 data/
 
 # Generated graph/context artifacts

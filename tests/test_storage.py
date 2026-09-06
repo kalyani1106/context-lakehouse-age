@@ -6,7 +6,7 @@ from backend.storage.models import ProcessingStatus, DocumentMetadata, Lakehouse
 
 class TestStorage(unittest.TestCase):
     def setUp(self):
-        self.test_dir = Path("./test_storage_tier")
+        self.test_dir = Path(__file__).parent.parent / "backend" / "test_storage_tier"
         self.storage = LocalLakehouseStorageService(root_dir=self.test_dir)
 
     def tearDown(self):

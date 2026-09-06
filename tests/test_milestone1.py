@@ -12,7 +12,7 @@ from backend.graph.age_client import AGEClient
 
 class TestMilestone1(unittest.TestCase):
     def setUp(self):
-        self.storage = LocalLakehouseStorageService(root_dir=Path("./test_lakehouse_storage"))
+        self.storage = LocalLakehouseStorageService(root_dir=Path(__file__).parent.parent / "backend" / "test_lakehouse_storage")
         self.extractor = PDFExtractor()
         self.age_client = AGEClient()
 
