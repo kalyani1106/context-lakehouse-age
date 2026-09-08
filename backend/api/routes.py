@@ -25,23 +25,30 @@ class CypherQueryResponse(BaseModel):
     result_count: int
     results: List[Dict[str, Any]]
 
-@router.post("/documents/upload", response_model=DocumentMetadata, summary="Upload a PDF document to Lakehouse (SHA-256 deduplicated)")
+@router.post("/documents/upload", response_model=DocumentMetadata, summary="Upload a document or data file to Lakehouse (SHA-256 deduplicated)")
 async def upload_document(
     file: UploadFile = File(...)
 ):
-    if not file.filename.lower().endswith(".pdf"):
-        raise HTTPException(status_code=400, detail="Only .pdf files are accepted.")
-    
+    from backend.extraction.file_detector import FileDetector, FileDetectionError
+
+    if not FileDetector.is_supported(file.filename):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported file format. Supported formats: {FileDetector.get_supported_extensions_display()}."
+        )
+
     file_bytes = await file.read()
     if len(file_bytes) == 0:
         raise HTTPException(status_code=400, detail="Uploaded file is empty (0 bytes).")
 
     try:
-        metadata = pipeline.upload_pdf(
+        metadata = pipeline.upload_document(
             filename=file.filename,
             file_bytes=file_bytes
         )
         return metadata
+    except FileDetectionError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
 

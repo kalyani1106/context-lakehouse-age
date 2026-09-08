@@ -34,7 +34,17 @@ COLOR_MAP = {
     "Dataset": "#0891B2",     # Cyan
     "ResearchPaper": "#475569",# Slate
     "Algorithm": "#DC2626",   # Red
-    "Project": "#EA580C"      # Orange
+    "Project": "#EA580C",     # Orange
+    # Structured & Multi-Format Entities
+    "Workbook": "#8B5CF6",    # Purple
+    "Sheet": "#3B82F6",       # Blue
+    "Column": "#06B6D4",      # Cyan
+    "DataType": "#64748B",    # Slate
+    "Field": "#0284C7",       # Sky Blue
+    "XmlElement": "#F59E0B",  # Amber
+    "Configuration": "#10B981", # Emerald
+    "ConfigKey": "#14B8A6",   # Teal
+    "JsonDataset": "#0891B2"  # Dark Cyan
 }
 
 # Try to load local vis-network.min.js if present for air-gapped / offline support

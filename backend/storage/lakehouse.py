@@ -85,8 +85,16 @@ class LocalLakehouseStorageService(StorageService):
             # Document with identical content already exists, return existing record
             return existing
 
+        # Determine extension and MIME type
+        ext = Path(filename).suffix.lower() or ".bin"
+        try:
+            from backend.extraction.file_detector import FileDetector
+            _, mime_type, _ = FileDetector.detect_format(filename, file_bytes)
+        except Exception:
+            mime_type = "application/pdf" if ext == ".pdf" else "application/octet-stream"
+
         # 1. Store in RAW tier
-        raw_path = self.raw_dir / f"{document_id}.pdf"
+        raw_path = self.raw_dir / f"{document_id}{ext}"
         with open(raw_path, "wb") as f:
             f.write(file_bytes)
 
@@ -94,7 +102,7 @@ class LocalLakehouseStorageService(StorageService):
         meta = DocumentMetadata(
             document_id=document_id,
             document_name=filename,
-            file_type="application/pdf",
+            file_type=mime_type,
             file_size_bytes=len(file_bytes),
             sha256=sha256_hash,
             status=ProcessingStatus.UPLOADED,
@@ -108,10 +116,25 @@ class LocalLakehouseStorageService(StorageService):
         return meta
 
     def get_document_path(self, document_id: str) -> Path:
-        path = self.raw_dir / f"{document_id}.pdf"
-        if not path.exists():
-            raise FileNotFoundError(f"Raw PDF for document {document_id} not found in Lakehouse raw tier.")
-        return path
+        # First check if document_id.pdf exists (legacy or standard)
+        pdf_path = self.raw_dir / f"{document_id}.pdf"
+        if pdf_path.exists():
+            return pdf_path
+
+        # Next check using metadata document_name extension
+        meta = self.get_metadata(document_id)
+        if meta and meta.document_name:
+            ext = Path(meta.document_name).suffix.lower()
+            exact_path = self.raw_dir / f"{document_id}{ext}"
+            if exact_path.exists():
+                return exact_path
+
+        # Search for any matching file document_id.* in raw dir
+        matches = list(self.raw_dir.glob(f"{document_id}.*"))
+        if matches:
+            return matches[0]
+
+        raise FileNotFoundError(f"Raw file for document {document_id} not found in Lakehouse raw tier.")
 
     def get_metadata(self, document_id: str) -> Optional[DocumentMetadata]:
         meta_path = self.metadata_dir / f"{document_id}.json"

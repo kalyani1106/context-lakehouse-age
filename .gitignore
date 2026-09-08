@@ -40,13 +40,14 @@ test_storage_tier/
 backend/test_storage_tier/
 test_lakehouse_storage/
 backend/test_lakehouse_storage/
+backend/test_multi_format_storage/
 data/
 
 # Generated graph/context artifacts
-graph_sync/
-extracted_pages/
-chunks/
-context/
+/graph_sync/
+/extracted_pages/
+/chunks/
+/context/
 
 
 # =========================

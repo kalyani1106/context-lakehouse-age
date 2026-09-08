@@ -29,6 +29,12 @@ from backend.git_graph.graph.git_graph_service import GitGraphService
 from backend.git_graph.graph.graph_insights import GraphInsightsService
 from backend.git_graph.graph.graph_export import GraphExportService
 from backend.git_graph.graph.cypher_queries import SAMPLE_CYPHER_QUERIES
+from backend.context_engine import (
+    ContextEngine,
+    ContextQueryRequest,
+    RetrievalMode,
+    QueryIntent,
+)
 
 st.set_page_config(
     page_title="Graphify & Context Lakehouse — Apache AGE",
@@ -54,10 +60,15 @@ def get_insights_service():
 def get_export_service():
     return GraphExportService()
 
+@st.cache_resource
+def get_context_engine():
+    return ContextEngine()
+
 pdf_pipeline = get_pdf_pipeline()
 git_pipeline = get_git_pipeline()
 insights_service = get_insights_service()
 export_service = get_export_service()
+context_engine = get_context_engine()
 
 # Custom CSS for modern styling
 st.markdown("""
@@ -160,17 +171,18 @@ with col2:
 with col3:
     st.markdown(f'<div class="stat-card"><div class="stat-number">{git_stats.get("total_edges", 0)}</div><div class="stat-label">Git Graph Edges</div></div>', unsafe_allow_html=True)
 with col4:
-    st.markdown(f'<div class="stat-card"><div class="stat-number">{len(pdf_docs)}</div><div class="stat-label">Lakehouse PDFs</div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="stat-card"><div class="stat-number">{len(pdf_docs)}</div><div class="stat-label">Lakehouse Documents</div></div>', unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
 # Main Navigation Tabs
-tab_git, tab_pdf_ingest, tab_pdf_context, tab_graph, tab_cypher = st.tabs([
+tab_git, tab_pdf_ingest, tab_pdf_context, tab_context_engine, tab_graph, tab_cypher = st.tabs([
     "🐙 1. Git Graphify",
-    "📄 2. PDF Lakehouse Ingestion",
-    "🧠 3. PDF Structured Context",
-    "🕸️ 4. Apache AGE Graph Visualizer",
-    "⚡ 5. openCypher Query Console"
+    "📄 2. Lakehouse Ingestion",
+    "📊 3. Structured Context Explorer",
+    "🧠 4. Context Engine",
+    "🕸️ 5. Apache AGE Graph Visualizer",
+    "⚡ 6. openCypher Query Console"
 ])
 
 # ----------------- TAB 1: Git Graphify -----------------
@@ -691,18 +703,155 @@ with tab_git:
     else:
         st.caption("No analyzed repositories in Apache AGE catalog yet.")
 
-# ----------------- TAB 2: PDF Lakehouse Ingestion (Untouched) -----------------
+# ----------------- TAB 2: Multi-Format Lakehouse Ingestion -----------------
 with tab_pdf_ingest:
-    st.subheader("Upload PDF Document to Lakehouse")
-    
-    uploaded_file = st.file_uploader("Select a research paper or document PDF", type=["pdf"])
+    st.markdown("### 📂 Upload Document / Data File to Lakehouse")
+    st.caption("Select a file format, upload your document or dataset, and ingest into structured Lakehouse tiers with automatic Apache AGE property graph generation.")
+
+    # Format definitions and metadata
+    FORMAT_CONFIG = {
+        "All Supported Formats": {
+            "extensions": ["pdf", "docx", "txt", "md", "markdown", "csv", "tsv", "xlsx", "xls", "json", "jsonl", "ndjson", "xml", "html", "htm", "parquet", "feather", "arrow", "yaml", "yml", "sql", "rtf"],
+            "description": "Universal ingestion • Ingest documents, tabular data, spreadsheets, and analytics datasets",
+            "badge": "All Formats"
+        },
+        "PDF (.pdf)": {
+            "extensions": ["pdf"],
+            "description": "Document format • Page-level text, headers, and semantic entity extraction",
+            "badge": "PDF"
+        },
+        "DOCX (.docx)": {
+            "extensions": ["docx"],
+            "description": "Word document • Paragraphs, headings, and structured table extraction",
+            "badge": "DOCX"
+        },
+        "TXT (.txt)": {
+            "extensions": ["txt", "text"],
+            "description": "Plain text • Unstructured text and document passage extraction",
+            "badge": "TXT"
+        },
+        "Markdown (.md)": {
+            "extensions": ["md", "markdown"],
+            "description": "Markdown document • Section headers, lists, and formatted text",
+            "badge": "Markdown"
+        },
+        "CSV (.csv)": {
+            "extensions": ["csv"],
+            "description": "Structured tabular data • Columns, inferred data types, and record samples",
+            "badge": "CSV"
+        },
+        "TSV (.tsv)": {
+            "extensions": ["tsv"],
+            "description": "Tab-separated values • Delimited columns, schema types, and records",
+            "badge": "TSV"
+        },
+        "Excel (.xlsx, .xls)": {
+            "extensions": ["xlsx", "xls"],
+            "description": "Spreadsheet workbook • Multi-sheet extraction, column schemas, and rows",
+            "badge": "Excel"
+        },
+        "JSON (.json)": {
+            "extensions": ["json"],
+            "description": "Structured hierarchical data • Key-value trees, nested schemas, and fields",
+            "badge": "JSON"
+        },
+        "JSONL / NDJSON (.jsonl, .ndjson)": {
+            "extensions": ["jsonl", "ndjson"],
+            "description": "Newline-delimited JSON • Line-by-line record parsing and schema extraction",
+            "badge": "JSONL"
+        },
+        "XML (.xml)": {
+            "extensions": ["xml"],
+            "description": "Hierarchical markup • Element tag hierarchy, attributes, and text nodes",
+            "badge": "XML"
+        },
+        "HTML (.html, .htm)": {
+            "extensions": ["html", "htm"],
+            "description": "Web document • Clean DOM text, headings, and structured tables",
+            "badge": "HTML"
+        },
+        "Parquet (.parquet)": {
+            "extensions": ["parquet", "pq"],
+            "description": "Columnar analytics dataset • PyArrow schema, data types, and records",
+            "badge": "Parquet"
+        },
+        "Feather (.feather)": {
+            "extensions": ["feather", "arrow"],
+            "description": "Arrow IPC binary table • Column definitions and record batches",
+            "badge": "Feather"
+        },
+        "YAML (.yaml, .yml)": {
+            "extensions": ["yaml", "yml"],
+            "description": "Configuration markup • Mappings, keys, and structured hierarchy",
+            "badge": "YAML"
+        },
+        "SQL (.sql)": {
+            "extensions": ["sql"],
+            "description": "SQL queries and DDL • Table definitions, statements, and schemas",
+            "badge": "SQL"
+        },
+        "RTF (.rtf)": {
+            "extensions": ["rtf"],
+            "description": "Rich text format • Formatted text extraction and document passages",
+            "badge": "RTF"
+        }
+    }
+
+    col_fmt, col_desc = st.columns([1, 2])
+    with col_fmt:
+        selected_fmt = st.selectbox(
+            "Select File Type:",
+            options=list(FORMAT_CONFIG.keys()),
+            index=0,
+            key="lakehouse_format_selector",
+            help="Filter upload validation to specific format or select 'All Supported Formats' for universal ingestion."
+        )
+    with col_desc:
+        current_cfg = FORMAT_CONFIG[selected_fmt]
+        st.markdown(f"""
+        <div class="insight-card" style="margin-top: 24px; padding: 10px 16px;">
+            <span style="color: #38BDF8; font-weight: 600;">{current_cfg['badge']}</span> • <span style="color: #94A3B8; font-size: 13px;">{current_cfg['description']}</span>
+        </div>
+        """, unsafe_allow_html=True)
+
+    allowed_types = current_cfg["extensions"]
+    uploaded_file = st.file_uploader(
+        f"Select or drag & drop a {selected_fmt} file (Max: 200 MB)",
+        type=allowed_types,
+        key="lakehouse_file_uploader",
+        help=f"Accepts: {', '.join(['.' + ext for ext in allowed_types])}"
+    )
+
+    st.caption("Supported formats: **PDF • DOCX • TXT • MD • CSV • TSV • XLSX • XLS • JSON • JSONL • XML • HTML • Parquet • Feather • YAML • SQL • RTF** • Maximum file size: **200 MB**")
+
     if uploaded_file is not None:
-        if st.button("📤 Upload & Ingest into Lakehouse", type="primary"):
-            file_bytes = uploaded_file.read()
-            with st.spinner("Calculating SHA-256 and checking Lakehouse catalog..."):
-                meta = pdf_pipeline.upload_pdf(filename=uploaded_file.name, file_bytes=file_bytes)
-                st.success(f"✅ Document registered in Lakehouse with ID: `{meta.document_id}`")
-                st.rerun()
+        file_ext = Path(uploaded_file.name).suffix.lower().lstrip(".")
+        if allowed_types and file_ext not in allowed_types:
+            st.warning(f"⚠️ **File type mismatch**: You selected **{selected_fmt}** but uploaded a `.{file_ext}` file. Please select the matching format in the dropdown or upload a valid file.")
+        else:
+            file_bytes = uploaded_file.getvalue()
+            file_size_kb = round(len(file_bytes) / 1024, 1)
+            file_size_mb = round(file_size_kb / 1024, 2)
+            size_display = f"{file_size_mb} MB ({file_size_kb:,} KB)" if file_size_mb >= 1.0 else f"{file_size_kb:,} KB"
+
+            st.markdown("---")
+            st.markdown("#### 📄 File Ready for Ingestion")
+            c_info1, c_info2, c_info3 = st.columns(3)
+            with c_info1:
+                st.markdown(f"**Filename:** `{uploaded_file.name}`")
+            with c_info2:
+                st.markdown(f"**Type:** `{current_cfg['badge']}` (`.{file_ext}`)")
+            with c_info3:
+                st.markdown(f"**Size:** `{size_display}`")
+
+            if st.button("🚀 Upload & Ingest into Lakehouse", type="primary", use_container_width=True):
+                with st.spinner("Calculating SHA-256 and registering in Lakehouse tiers..."):
+                    try:
+                        meta = pdf_pipeline.upload_document(filename=uploaded_file.name, file_bytes=file_bytes)
+                        st.success(f"✅ Document registered in Lakehouse with ID: `{meta.document_id}`")
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"❌ Upload failed: {e}")
 
     st.markdown("---")
     st.subheader("Lakehouse Document Catalog")
@@ -712,11 +861,32 @@ with tab_pdf_ingest:
     else:
         doc_table = []
         for d in pdf_docs:
+            fname = d.document_name.lower()
+            custom = d.custom_metadata or {}
+            
+            if "sheet_count" in custom:
+                metric_str = f"{custom['sheet_count']} sheets"
+            elif "record_count" in custom:
+                metric_str = f"{custom['record_count']} records"
+            elif "element_count" in custom:
+                metric_str = f"{custom['element_count']} elements"
+            elif fname.endswith(('.xlsx', '.xls')):
+                metric_str = f"{d.total_pages} sheets" if d.total_pages is not None else "-"
+            elif fname.endswith(('.csv', '.tsv', '.parquet', '.feather', '.jsonl', '.ndjson')):
+                metric_str = f"{d.total_pages} records" if d.total_pages is not None else "-"
+            elif fname.endswith(('.json',)):
+                metric_str = f"{d.total_pages} items" if d.total_pages is not None else "-"
+            elif fname.endswith(('.xml',)):
+                metric_str = f"{d.total_pages} elements" if d.total_pages is not None else "-"
+            else:
+                metric_str = f"{d.total_pages} pages" if d.total_pages is not None else "-"
+
             doc_table.append({
                 "Document ID": d.document_id,
                 "Filename": d.document_name,
+                "File Type": d.file_type or "application/octet-stream",
                 "Size (KB)": round(d.file_size_bytes / 1024, 1),
-                "Pages": d.total_pages if d.total_pages is not None else "-",
+                "Pages / Sheets / Records": metric_str,
                 "Entities": d.total_entities if d.total_entities is not None else "-",
                 "Relations": d.total_relationships if d.total_relationships is not None else "-",
                 "Status": d.status.value
@@ -728,15 +898,18 @@ with tab_pdf_ingest:
         selected_label = st.selectbox("Select document to process:", options=list(doc_options.keys()))
         selected_doc_id = doc_options[selected_label]
         
-        if st.button("🚀 Run PDF Pipeline", type="primary"):
-            with st.spinner("Processing PDF document..."):
-                res = pdf_pipeline.process_document(selected_doc_id)
-                st.success(f"✅ PDF Processed! Extracted {res['total_entities']} entities & {res['total_relationships']} relations.")
-                st.rerun()
+        if st.button("🚀 Run Lakehouse Ingestion Pipeline", type="primary"):
+            with st.spinner("Processing document through multi-format pipeline..."):
+                try:
+                    res = pdf_pipeline.process_document(selected_doc_id)
+                    st.success(f"✅ Ingestion Complete! Extracted {res['total_entities']} entities & {res['total_relationships']} relations into Apache AGE.")
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"❌ Processing failed: {e}")
 
-# ----------------- TAB 3: PDF Structured Context Explorer -----------------
+# ----------------- TAB 3: Structured Context Explorer -----------------
 with tab_pdf_context:
-    st.subheader("PDF Structured Context & Provenance")
+    st.subheader("Structured Context & Provenance")
     if not pdf_docs:
         st.info("No documents in Lakehouse.")
     else:
@@ -750,7 +923,256 @@ with tab_pdf_context:
         else:
             st.json(context_data)
 
-# ----------------- TAB 4: Apache AGE Graph Visualizer -----------------
+# ----------------- TAB 4: Context Engine -----------------
+with tab_context_engine:
+    st.markdown("## 🧠 Intelligent Context Engine")
+    st.markdown("Query the hybrid intelligence layer bridging **Apache AGE Knowledge Graphs** and **Context Lakehouse Storage**. Deterministically analyzes queries, traverses graph topology, scores passages with BM25, ranks with multi-factor weighting, and generates token-budgeted context with line-level provenance.")
+
+    # Target Scope Selection
+    scope_col1, scope_col2 = st.columns([1, 2])
+    with scope_col1:
+        target_scope_type = st.selectbox(
+            "Target Scope:",
+            options=["Global (All Repositories & Documents)", "Specific Git Repository", "Specific Lakehouse Document"],
+            key="ce_scope_type"
+        )
+    
+    scoped_repo_name = None
+    scoped_doc_name = None
+    scoped_doc_id = None
+
+    with scope_col2:
+        if target_scope_type == "Specific Git Repository":
+            repo_names = [r.get("name") for r in git_repos if r.get("name")]
+            if repo_names:
+                scoped_repo_name = st.selectbox("Select Target Repository:", options=repo_names, key="ce_repo_sel")
+            else:
+                st.info("No Git repositories analyzed yet. (Analyze in Tab 1)")
+        elif target_scope_type == "Specific Lakehouse Document":
+            if pdf_docs:
+                doc_map = {f"{d.document_name} ({d.document_id})": d for d in pdf_docs}
+                sel_doc_label = st.selectbox("Select Target Document:", options=list(doc_map.keys()), key="ce_doc_sel")
+                sel_doc_obj = doc_map[sel_doc_label]
+                scoped_doc_name = sel_doc_obj.document_name
+                scoped_doc_id = sel_doc_obj.document_id
+            else:
+                st.info("No documents in Lakehouse yet. (Upload in Tab 2)")
+
+    # Quick Example Prompts
+    st.markdown("**💡 Quick Query Templates:**")
+    q_col1, q_col2, q_col3, q_col4, q_col5 = st.columns(5)
+    
+    default_prompt = "How does authentication and token verification work in this codebase?"
+    if "ce_query_input" not in st.session_state:
+        st.session_state["ce_query_input"] = default_prompt
+
+    if q_col1.button("🏗️ Architecture", use_container_width=True):
+        st.session_state["ce_query_input"] = "What is the high-level architecture, main components, and layer design?"
+        st.rerun()
+    if q_col2.button("🔐 Authentication", use_container_width=True):
+        st.session_state["ce_query_input"] = "How does authentication, login, JWT tokens, and user verification work?"
+        st.rerun()
+    if q_col3.button("🌐 API Endpoints", use_container_width=True):
+        st.session_state["ce_query_input"] = "What are the REST API endpoints, FastAPI routes, and request handlers?"
+        st.rerun()
+    if q_col4.button("📦 Dependencies", use_container_width=True):
+        st.session_state["ce_query_input"] = "What classes inherit from BaseStorage and what modules import AgeClient?"
+        st.rerun()
+    if q_col5.button("📊 Schemas & Flow", use_container_width=True):
+        st.session_state["ce_query_input"] = "Describe the data flow from ingestion to chunking and Apache AGE graph storage."
+        st.rerun()
+
+    # Query Input
+    query_text = st.text_area(
+        "Natural Language Query / Prompt for Context Engine:",
+        value=st.session_state.get("ce_query_input", default_prompt),
+        height=90,
+        key="ce_active_query_text"
+    )
+
+    # Retrieval & Ranking Parameters Expander
+    with st.expander("⚙️ Advanced Retrieval & Ranking Parameters", expanded=False):
+        c_mode, c_topk, c_tokens, c_depth = st.columns(4)
+        with c_mode:
+            mode_choice = st.selectbox(
+                "Retrieval Mode:",
+                options=["hybrid", "graph", "semantic"],
+                index=0,
+                help="Hybrid combines graph topology + lexical search. Graph uses only Apache AGE. Semantic uses only Lakehouse chunks."
+            )
+        with c_topk:
+            top_k_val = st.slider("Top K Results:", min_value=3, max_value=30, value=10, step=1)
+        with c_tokens:
+            max_tokens_val = st.slider("Max Context Tokens:", min_value=500, max_value=12000, value=4000, step=500)
+        with c_depth:
+            depth_val = st.slider("Graph Traversal Depth:", min_value=1, max_value=3, value=2, step=1)
+
+        st.markdown("**Scoring Weights:**")
+        w_col1, w_col2, w_col3 = st.columns(3)
+        with w_col1:
+            g_weight = st.slider("Graph Connectivity Weight:", 0.0, 1.0, 0.5, 0.05)
+        with w_col2:
+            s_weight = st.slider("Semantic / BM25 Weight:", 0.0, 1.0, 0.3, 0.05)
+        with w_col3:
+            p_weight = st.slider("Provenance Completeness Weight:", 0.0, 1.0, 0.2, 0.05)
+
+    # Execution Button
+    if st.button("🚀 Retrieve & Assemble Context", type="primary", use_container_width=True):
+        if not query_text.strip():
+            st.warning("Please enter a query.")
+        else:
+            with st.spinner("Analyzing query, traversing Apache AGE graphs & scoring Lakehouse passages..."):
+                try:
+                    req = ContextQueryRequest(
+                        query=query_text.strip(),
+                        repo_name=scoped_repo_name,
+                        doc_name=scoped_doc_name,
+                        document_id=scoped_doc_id,
+                        mode=RetrievalMode(mode_choice),
+                        top_k=top_k_val,
+                        max_context_tokens=max_tokens_val,
+                        graph_weight=g_weight,
+                        semantic_weight=s_weight,
+                        provenance_weight=p_weight,
+                        traversal_depth=depth_val,
+                    )
+                    resp = context_engine.query_context(req)
+                    st.session_state["ce_last_response"] = resp
+                except Exception as e:
+                    st.error(f"Context retrieval error: {e}")
+
+    # Display results if available
+    if "ce_last_response" in st.session_state:
+        resp = st.session_state["ce_last_response"]
+        st.markdown("---")
+        
+        # 1. Query Analysis Banner
+        qa = resp.query_analysis
+        st.markdown("### 🎯 Query Understanding & Intent")
+        qa_col1, qa_col2, qa_col3 = st.columns([1, 2, 2])
+        with qa_col1:
+            st.markdown(f"**Intent**: `{qa.intent.value}`")
+        with qa_col2:
+            entities_str = ", ".join([f"`{e}`" for e in qa.extracted_entities]) if qa.extracted_entities else "*None detected*"
+            st.markdown(f"**Entities**: {entities_str}")
+        with qa_col3:
+            targets_str = ", ".join([f"`{t}`" for t in qa.detected_targets]) if qa.detected_targets else "*None detected*"
+            st.markdown(f"**Target Symbols/Files**: {targets_str}")
+
+        # 2. Retrieval Metrics KPI
+        st.markdown("<br>", unsafe_allow_html=True)
+        m_col1, m_col2, m_col3, m_col4 = st.columns(4)
+        with m_col1:
+            st.markdown(f'<div class="stat-card"><div class="stat-number">{resp.stats.retrieval_time_ms:.1f} ms</div><div class="stat-label">Retrieval Latency</div></div>', unsafe_allow_html=True)
+        with m_col2:
+            st.markdown(f'<div class="stat-card"><div class="stat-number">{resp.stats.nodes_retrieved + resp.stats.edges_retrieved}</div><div class="stat-label">Graph Items (Nodes+Edges)</div></div>', unsafe_allow_html=True)
+        with m_col3:
+            st.markdown(f'<div class="stat-card"><div class="stat-number">{resp.stats.chunks_retrieved}</div><div class="stat-label">Lakehouse Chunks</div></div>', unsafe_allow_html=True)
+        with m_col4:
+            st.markdown(f'<div class="stat-card"><div class="stat-number">{resp.stats.total_tokens_estimated}</div><div class="stat-label">Assembled Tokens</div></div>', unsafe_allow_html=True)
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        # 3. Assembled Context Markdown Block
+        st.markdown("### 📋 Assembled Context Payload (LLM Ready)")
+        st.caption(f"Token budget: {resp.stats.total_tokens_estimated} / {resp.query_analysis.filters.get('max_tokens', 4000)} estimated tokens.")
+        st.code(resp.assembled_context, language="markdown")
+
+        # 4. Interactive Knowledge Subgraph Visualization
+        from backend.context_engine.models import ContextType
+        graph_nodes = [item for item in resp.items if item.type == ContextType.ENTITY]
+        graph_edges = [item for item in resp.items if item.type == ContextType.RELATIONSHIP]
+
+        if graph_nodes or graph_edges:
+            with st.expander(f"🕸️ Retrieved Knowledge Subgraph ({len(graph_nodes)} Entities, {len(graph_edges)} Relations)", expanded=True):
+                sub_vis_nodes = []
+                sub_vis_edges = []
+                node_id_map = {}
+                
+                for idx, gn in enumerate(graph_nodes):
+                    nid = gn.metadata.get("node_id") or f"sub_node_{idx}"
+                    label = gn.metadata.get("label", "Concept")
+                    name = gn.title.split(": ")[-1].split(" [")[0]
+                    node_id_map[gn.id] = nid
+                    node_id_map[name] = nid
+                    sub_vis_nodes.append({
+                        "id": nid,
+                        "label": label,
+                        "name": name,
+                        "canonical_id": gn.id,
+                        "entity_type": label,
+                        "file_path": gn.provenance.file_path if gn.provenance else "",
+                        "start_line": gn.provenance.start_line if gn.provenance else 1,
+                        "source_snippet": gn.provenance.snippet if gn.provenance else "",
+                        "properties": gn.metadata.get("properties", {})
+                    })
+
+                for idx, ge in enumerate(graph_edges):
+                    src_name = ge.metadata.get("source", "")
+                    tgt_name = ge.metadata.get("target", "")
+                    rel_type = ge.metadata.get("relationship_type", "RELATED_TO")
+                    
+                    src_id = node_id_map.get(src_name) or f"src_{idx}"
+                    tgt_id = node_id_map.get(tgt_name) or f"tgt_{idx}"
+                    
+                    if src_id == f"src_{idx}":
+                        sub_vis_nodes.append({"id": src_id, "label": "Concept", "name": src_name, "entity_type": "Concept"})
+                        node_id_map[src_name] = src_id
+                    if tgt_id == f"tgt_{idx}":
+                        sub_vis_nodes.append({"id": tgt_id, "label": "Concept", "name": tgt_name, "entity_type": "Concept"})
+                        node_id_map[tgt_name] = tgt_id
+
+                    sub_vis_edges.append({
+                        "id": f"sub_edge_{idx}",
+                        "label": rel_type,
+                        "relationship_type": rel_type,
+                        "source": src_id,
+                        "target": tgt_id,
+                        "file_path": ge.provenance.file_path if ge.provenance else "",
+                        "start_line": ge.provenance.start_line if ge.provenance else 1,
+                        "source_snippet": ge.provenance.snippet if ge.provenance else "",
+                    })
+
+                if sub_vis_nodes:
+                    sub_graph_data = {"nodes": sub_vis_nodes, "edges": sub_vis_edges}
+                    sub_html = render_visjs_graph(sub_graph_data, height="450px")
+                    components.html(sub_html, height=450, scrolling=False)
+
+        # 5. Ranked Context Items Inspector
+        with st.expander(f"📑 Ranked Context Items Breakdown ({len(resp.items)} items)", expanded=False):
+            for idx, item in enumerate(resp.items, 1):
+                st.markdown(f"**{idx}. [{item.type.value}] {item.title}** — *Composite Score: `{item.score:.3f}` (Graph: `{item.graph_score:.2f}`, Semantic: `{item.semantic_score:.2f}`, Provenance: `{item.provenance_score:.2f}`)*")
+                st.markdown(item.content)
+                if item.provenance:
+                    prov = item.provenance
+                    if prov.source_type == "git":
+                        loc_str = f"`{prov.file_path}:L{prov.start_line}-L{prov.end_line}`" if prov.start_line else f"`{prov.file_path}`"
+                        st.caption(f"📍 Provenance: Repository `{prov.repo_name}` | File {loc_str} | Commit `[{prov.commit_hash[:7] if prov.commit_hash else 'HEAD'}]`")
+                    else:
+                        st.caption(f"📍 Provenance: Document `{prov.document_name or prov.document_id}` | Page {prov.page_number} | Chunk `{prov.chunk_id}`")
+                st.markdown("---")
+
+        # 6. Citations & Provenance Ledger
+        with st.expander(f"🏷️ Citation & Provenance Ledger ({len(resp.citations)} Sources)", expanded=False):
+            if resp.citations:
+                cit_data = []
+                for c in resp.citations:
+                    cit_data.append({
+                        "Type": c.source_type.upper(),
+                        "Target / File / Document": c.file_path or c.document_name or c.document_id or "-",
+                        "Line / Page": f"L{c.start_line}-L{c.end_line}" if c.start_line else (f"Page {c.page_number}" if c.page_number else "-"),
+                        "Repository / Doc ID": c.repo_name or c.document_id or "-",
+                        "Commit / Chunk": c.commit_hash[:7] if c.commit_hash else (c.chunk_id or "-"),
+                    })
+                st.dataframe(pd.DataFrame(cit_data), use_container_width=True)
+            else:
+                st.info("No explicit citations found.")
+
+        # 7. Raw JSON Response Expander
+        with st.expander("🔍 Raw JSON Response (API Format)", expanded=False):
+            st.json(resp.model_dump())
+
+# ----------------- TAB 5: Apache AGE Graph Visualizer -----------------
 with tab_graph:
     st.subheader("🕸️ Apache AGE Knowledge Graph Visualizer")
     
@@ -758,7 +1180,7 @@ with tab_graph:
     with col_scope:
         graph_target = st.radio(
             "Select Graph Source:",
-            options=["Git Repository Knowledge Graph", "PDF Document Subgraph", "PDF Full Knowledge Graph"],
+            options=["Git Repository Knowledge Graph", "Document / Dataset Subgraph", "Full Lakehouse Knowledge Graph"],
             horizontal=True
         )
     with col_limit:
@@ -776,13 +1198,13 @@ with tab_graph:
         else:
             st.info("No Git repositories analyzed yet. Analyze a repository in Tab 1.")
             graph_data = {"nodes": [], "edges": []}
-    elif graph_target == "PDF Document Subgraph" and pdf_docs:
+    elif graph_target == "Document / Dataset Subgraph" and pdf_docs:
         sub_doc_options = {f"{d.document_name} ({d.document_id})": d.document_id for d in pdf_docs if d.status == ProcessingStatus.COMPLETED}
         if sub_doc_options:
-            selected_sub_label = st.selectbox("Select PDF Subgraph:", options=list(sub_doc_options.keys()))
+            selected_sub_label = st.selectbox("Select Document / Dataset Subgraph:", options=list(sub_doc_options.keys()))
             graph_data = pdf_pipeline.graph_service.get_document_subgraph(sub_doc_options[selected_sub_label])
         else:
-            st.info("No completed PDF documents yet.")
+            st.info("No completed documents in Lakehouse yet.")
             graph_data = {"nodes": [], "edges": []}
     else:
         graph_data = pdf_pipeline.graph_service.get_full_graph(limit=node_limit)

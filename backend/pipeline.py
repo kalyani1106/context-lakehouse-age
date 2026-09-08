@@ -18,6 +18,7 @@ from backend.storage.base import StorageService
 from backend.storage.lakehouse import LocalLakehouseStorageService
 from backend.storage.models import DocumentMetadata, ProcessingStatus, ExtractionMethod
 from backend.extraction.pdf_extractor import PDFExtractor, ExtractedDocument
+from backend.extraction.document_extractor import DocumentExtractor
 from backend.extraction.chunker import DocumentChunker, DocumentChunk
 from backend.context.extractor import ContextExtractor
 from backend.context.schemas import DocumentContext
@@ -29,16 +30,42 @@ class PDFContextPipeline:
     def __init__(
         self,
         storage: Optional[StorageService] = None,
-        extractor: Optional[PDFExtractor] = None,
+        extractor: Optional[Any] = None,
         chunker: Optional[DocumentChunker] = None,
         context_extractor: Optional[ContextExtractor] = None,
         graph_service: Optional[GraphService] = None
     ):
         self.storage = storage or LocalLakehouseStorageService()
-        self.extractor = extractor or PDFExtractor()
+        self.extractor = extractor or DocumentExtractor()
         self.chunker = chunker or DocumentChunker()
         self.context_extractor = context_extractor or ContextExtractor()
         self.graph_service = graph_service or GraphService()
+
+    def upload_document(
+        self,
+        filename: str,
+        file_bytes: bytes,
+        document_id: Optional[str] = None,
+        custom_metadata: Optional[Dict[str, Any]] = None
+    ) -> DocumentMetadata:
+        """
+        Store any supported document or data file in Lakehouse raw tier with SHA-256 content deduplication.
+        If identical document content already exists, returns the existing document record.
+        """
+        sha256_hash = hashlib.sha256(file_bytes).hexdigest()
+        existing = self.storage.get_document_by_hash(sha256_hash)
+        if existing:
+            logger.info(f"Duplicate document detected (SHA-256: {sha256_hash[:12]}...). Returning existing document ID: '{existing.document_id}'")
+            return existing
+
+        doc_id = document_id or f"doc_{uuid.uuid4().hex[:10]}"
+        logger.info(f"Uploading new document '{filename}' to Lakehouse with doc ID '{doc_id}' (SHA-256: {sha256_hash[:12]}...)")
+        return self.storage.upload_document(
+            document_id=doc_id,
+            filename=filename,
+            file_bytes=file_bytes,
+            custom_metadata=custom_metadata
+        )
 
     def upload_pdf(
         self,
@@ -48,21 +75,12 @@ class PDFContextPipeline:
         custom_metadata: Optional[Dict[str, Any]] = None
     ) -> DocumentMetadata:
         """
-        Store PDF in Lakehouse raw tier with SHA-256 content deduplication.
-        If identical PDF content already exists, returns the existing document record.
+        Store PDF in Lakehouse raw tier with SHA-256 content deduplication (legacy wrapper).
         """
-        sha256_hash = hashlib.sha256(file_bytes).hexdigest()
-        existing = self.storage.get_document_by_hash(sha256_hash)
-        if existing:
-            logger.info(f"Duplicate document detected (SHA-256: {sha256_hash[:12]}...). Returning existing document ID: '{existing.document_id}'")
-            return existing
-
-        doc_id = document_id or f"doc_{uuid.uuid4().hex[:10]}"
-        logger.info(f"Uploading new PDF '{filename}' to Lakehouse with doc ID '{doc_id}' (SHA-256: {sha256_hash[:12]}...)")
-        return self.storage.upload_document(
-            document_id=doc_id,
+        return self.upload_document(
             filename=filename,
             file_bytes=file_bytes,
+            document_id=document_id,
             custom_metadata=custom_metadata
         )
 

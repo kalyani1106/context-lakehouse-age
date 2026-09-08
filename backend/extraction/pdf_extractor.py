@@ -20,6 +20,7 @@ class ExtractedDocument(BaseModel):
     total_characters: int
     total_words: int
     pages: List[ExtractedPage]
+    metadata: Dict[str, Any] = Field(default_factory=dict)
 
 class PDFExtractionError(Exception):
     """Custom exception raised when PDF extraction fails."""

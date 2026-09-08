@@ -111,9 +111,10 @@ class GraphService:
                 src_text = ent.source.source_text[:300]
                 aliases_str = ", ".join(ent.aliases) if isinstance(ent.aliases, list) else str(ent.aliases or "")
 
+                display_name = ent.name or cname
                 create_q = f"""
                 CREATE (n:{label} {{
-                    name: {self.cypher_val(cname)},
+                    name: {self.cypher_val(display_name)},
                     canonical_name: {self.cypher_val(cname)},
                     entity_type: {self.cypher_val(label)},
                     description: {self.cypher_val(desc)},

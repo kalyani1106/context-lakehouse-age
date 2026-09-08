@@ -1,0 +1,564 @@
+[
+  {
+    "id": 1,
+    "category": "Authentication query (Global)",
+    "query": "How does authentication work?",
+    "scope": {
+      "repo_name": null,
+      "document_id": null
+    },
+    "intent": "AUTHENTICATION",
+    "keywords": [
+      "authentication"
+    ],
+    "detected_targets": [],
+    "extracted_entities": [],
+    "nodes_retrieved": 6,
+    "edges_retrieved": 6,
+    "chunks_retrieved": 1,
+    "total_candidates": 13,
+    "final_items_count": 8,
+    "citation_count": 7,
+    "retrieval_time_ms": 991.37,
+    "total_elapsed_ms": 991.42,
+    "top_items": [
+      {
+        "title": "Code Entity: LakehouseLayer [Class]",
+        "type": "ENTITY",
+        "score": 1.32,
+        "graph_score": 1.0,
+        "semantic_score": 0.0,
+        "provenance": {
+          "source_type": "git",
+          "document_id": null,
+          "document_name": null,
+          "page_number": null,
+          "repo_name": ".",
+          "file_path": "storage/models.py",
+          "start_line": 50,
+          "end_line": 65,
+          "commit_hash": "819e47721f37e82ea7fa9fe42be4df6f7509c83e",
+          "chunk_id": null,
+          "snippet": "class LakehouseLayer(str, Enum):     \"\"\"     Explicit architectural lakehouse tiers:     - RAW: Unmodified binary assets (PDFs)     - METADATA: Catalog and lifecycle tracking     - EXTRACTED_PAGES: Cleaned page-level text extraction     - CHUNKS: Token/character bounded passage chunks with provenance     - CONTEXT: Structured semantic context (entities & relationships)     - GRAPH_SYNC: Sync logs"
+        }
+      },
+      {
+        "title": "Code Entity: LakehouseLayer [Class]",
+        "type": "ENTITY",
+        "score": 1.32,
+        "graph_score": 1.0,
+        "semantic_score": 0.0,
+        "provenance": {
+          "source_type": "git",
+          "document_id": null,
+          "document_name": null,
+          "page_number": null,
+          "repo_name": "context-lakehouse-age",
+          "file_path": "storage/models.py",
+          "start_line": 50,
+          "end_line": 65,
+          "commit_hash": "969c5064ef0281e33581ec6b5ad4f6d1be34d885",
+          "chunk_id": null,
+          "snippet": "class LakehouseLayer(str, Enum):     \"\"\"     Explicit architectural lakehouse tiers:     - RAW: Unmodified binary assets (PDFs)     - METADATA: Catalog and lifecycle tracking     - EXTRACTED_PAGES: Cleaned page-level text extraction     - CHUNKS: Token/character bounded passage chunks with provenance     - CONTEXT: Structured semantic context (entities & relationships)     - GRAPH_SYNC: Sync logs"
+        }
+      },
+      {
+        "title": "Document Chunk: A Report on Context Lakehouse.pdf (p.8, doc_9510bf18f5_p8_c0)",
+        "type": "CHUNK",
+        "score": 1.32,
+        "graph_score": 0.0,
+        "semantic_score": 1.0,
+        "provenance": {
+          "source_type": "document",
+          "document_id": "doc_9510bf18f5",
+          "document_name": "A Report on Context Lakehouse.pdf",
+          "page_number": 8,
+          "repo_name": null,
+          "file_path": null,
+          "start_line": null,
+          "end_line": null,
+          "commit_hash": null,
+          "chunk_id": "doc_9510bf18f5_p8_c0",
+          "snippet": "Why federation matters\nBecause: Context does not live in one place. A customer's complete story may be distributed across multiple systems. Governance\nAI agents need access to data, but unrestricted access can create security and\ncompliance problems."
+        }
+      }
+    ],
+    "context_preview": "# Context Retrieval: How does authentication work?\n\n## \ud83c\udfaf Query Analysis\n- **Intent**: `AUTHENTICATION`\n- **Keywords**: authentication\n\n\n## \ud83d\udd78\ufe0f Knowledge Graph Entities & Nodes\n\n### Code Entity: LakehouseLayer [Class]\n**Symbol**: `LakehouseLayer` (Class)\n**Canonical ID**: `repo:.:file:storage/models.p..."
+  },
+  {
+    "id": 2,
+    "category": "Token verification query (Global)",
+    "query": "How are tokens verified?",
+    "scope": {
+      "repo_name": null,
+      "document_id": null
+    },
+    "intent": "AUTHENTICATION",
+    "keywords": [
+      "tokens",
+      "verified"
+    ],
+    "detected_targets": [],
+    "extracted_entities": [],
+    "nodes_retrieved": 6,
+    "edges_retrieved": 6,
+    "chunks_retrieved": 1,
+    "total_candidates": 13,
+    "final_items_count": 8,
+    "citation_count": 7,
+    "retrieval_time_ms": 1266.37,
+    "total_elapsed_ms": 1266.42,
+    "top_items": [
+      {
+        "title": "Code Entity: LakehouseLayer [Class]",
+        "type": "ENTITY",
+        "score": 1.32,
+        "graph_score": 1.0,
+        "semantic_score": 0.0,
+        "provenance": {
+          "source_type": "git",
+          "document_id": null,
+          "document_name": null,
+          "page_number": null,
+          "repo_name": ".",
+          "file_path": "storage/models.py",
+          "start_line": 50,
+          "end_line": 65,
+          "commit_hash": "819e47721f37e82ea7fa9fe42be4df6f7509c83e",
+          "chunk_id": null,
+          "snippet": "class LakehouseLayer(str, Enum):     \"\"\"     Explicit architectural lakehouse tiers:     - RAW: Unmodified binary assets (PDFs)     - METADATA: Catalog and lifecycle tracking     - EXTRACTED_PAGES: Cleaned page-level text extraction     - CHUNKS: Token/character bounded passage chunks with provenance     - CONTEXT: Structured semantic context (entities & relationships)     - GRAPH_SYNC: Sync logs"
+        }
+      },
+      {
+        "title": "Code Entity: LakehouseLayer [Class]",
+        "type": "ENTITY",
+        "score": 1.32,
+        "graph_score": 1.0,
+        "semantic_score": 0.0,
+        "provenance": {
+          "source_type": "git",
+          "document_id": null,
+          "document_name": null,
+          "page_number": null,
+          "repo_name": "context-lakehouse-age",
+          "file_path": "storage/models.py",
+          "start_line": 50,
+          "end_line": 65,
+          "commit_hash": "969c5064ef0281e33581ec6b5ad4f6d1be34d885",
+          "chunk_id": null,
+          "snippet": "class LakehouseLayer(str, Enum):     \"\"\"     Explicit architectural lakehouse tiers:     - RAW: Unmodified binary assets (PDFs)     - METADATA: Catalog and lifecycle tracking     - EXTRACTED_PAGES: Cleaned page-level text extraction     - CHUNKS: Token/character bounded passage chunks with provenance     - CONTEXT: Structured semantic context (entities & relationships)     - GRAPH_SYNC: Sync logs"
+        }
+      },
+      {
+        "title": "Document Chunk: Report on Building a Semantic Layer with Apache AGE.pdf (p.3, doc_e1233d884f_p3_c0)",
+        "type": "CHUNK",
+        "score": 1.32,
+        "graph_score": 0.0,
+        "semantic_score": 1.0,
+        "provenance": {
+          "source_type": "document",
+          "document_id": "doc_e1233d884f",
+          "document_name": "Report on Building a Semantic Layer with Apache AGE.pdf",
+          "page_number": 3,
+          "repo_name": null,
+          "file_path": null,
+          "start_line": null,
+          "end_line": null,
+          "commit_hash": null,
+          "chunk_id": "doc_e1233d884f_p3_c0",
+          "snippet": "5. PostgreSQL Setup\nExplain:\n1. Install PostgreSQL.\n2. Create database.\n3. Configure PostgreSQL.\n4. Verify connection.\n5. Configure port.\n6. Create user/password.\n7. Connect from Python.\nExample:\nCREATE DATABASE knowledge_graph_demo;\nThen show the Py"
+        }
+      }
+    ],
+    "context_preview": "# Context Retrieval: How are tokens verified?\n\n## \ud83c\udfaf Query Analysis\n- **Intent**: `AUTHENTICATION`\n- **Keywords**: tokens, verified\n\n\n## \ud83d\udd78\ufe0f Knowledge Graph Entities & Nodes\n\n### Code Entity: LakehouseLayer [Class]\n**Symbol**: `LakehouseLayer` (Class)\n**Canonical ID**: `repo:.:file:storage/models.py:c..."
+  },
+  {
+    "id": 3,
+    "category": "Dependencies query (Repo)",
+    "query": "What are the main dependencies?",
+    "scope": {
+      "repo_name": "context-lakehouse-age",
+      "document_id": null
+    },
+    "intent": "DEPENDENCY",
+    "keywords": [
+      "main",
+      "dependencies"
+    ],
+    "detected_targets": [],
+    "extracted_entities": [],
+    "nodes_retrieved": 2,
+    "edges_retrieved": 17,
+    "chunks_retrieved": 0,
+    "total_candidates": 19,
+    "final_items_count": 8,
+    "citation_count": 8,
+    "retrieval_time_ms": 421.82,
+    "total_elapsed_ms": 421.89,
+    "top_items": [
+      {
+        "title": "Relationship: requirements.txt \u2192 DEPENDS_ON \u2192 fastapi",
+        "type": "RELATIONSHIP",
+        "score": 1.1782,
+        "graph_score": 0.85,
+        "semantic_score": 0.0,
+        "provenance": {
+          "source_type": "git",
+          "document_id": null,
+          "document_name": null,
+          "page_number": null,
+          "repo_name": "context-lakehouse-age",
+          "file_path": "requirements.txt",
+          "start_line": 1,
+          "end_line": 1,
+          "commit_hash": "969c5064ef0281e33581ec6b5ad4f6d1be34d885",
+          "chunk_id": null,
+          "snippet": "fastapi>=0.110.0"
+        }
+      },
+      {
+        "title": "Relationship: requirements.txt \u2192 DEPENDS_ON \u2192 uvicorn",
+        "type": "RELATIONSHIP",
+        "score": 1.1782,
+        "graph_score": 0.85,
+        "semantic_score": 0.0,
+        "provenance": {
+          "source_type": "git",
+          "document_id": null,
+          "document_name": null,
+          "page_number": null,
+          "repo_name": "context-lakehouse-age",
+          "file_path": "requirements.txt",
+          "start_line": 2,
+          "end_line": 2,
+          "commit_hash": "969c5064ef0281e33581ec6b5ad4f6d1be34d885",
+          "chunk_id": null,
+          "snippet": "uvicorn>=0.28.0"
+        }
+      },
+      {
+        "title": "Relationship: requirements.txt \u2192 DEPENDS_ON \u2192 pydantic",
+        "type": "RELATIONSHIP",
+        "score": 1.1782,
+        "graph_score": 0.85,
+        "semantic_score": 0.0,
+        "provenance": {
+          "source_type": "git",
+          "document_id": null,
+          "document_name": null,
+          "page_number": null,
+          "repo_name": "context-lakehouse-age",
+          "file_path": "requirements.txt",
+          "start_line": 3,
+          "end_line": 3,
+          "commit_hash": "969c5064ef0281e33581ec6b5ad4f6d1be34d885",
+          "chunk_id": null,
+          "snippet": "pydantic>=2.6.0"
+        }
+      }
+    ],
+    "context_preview": "# Context Retrieval: What are the main dependencies?\n\n## \ud83c\udfaf Query Analysis\n- **Intent**: `DEPENDENCY`\n- **Keywords**: main, dependencies\n\n\n## \ud83d\udd17 Graph Relationships & Linkages\n\n- `requirements.txt` --[:DEPENDS_ON]--> `fastapi` *(defined in `requirements.txt`)* *(Score: 1.18)*\n- `requirements.txt` --[:..."
+  },
+  {
+    "id": 4,
+    "category": "API endpoints query (Repo)",
+    "query": "Show me the API endpoints.",
+    "scope": {
+      "repo_name": "context-lakehouse-age",
+      "document_id": null
+    },
+    "intent": "API_ROUTES",
+    "keywords": [
+      "api",
+      "endpoints"
+    ],
+    "detected_targets": [],
+    "extracted_entities": [
+      "API"
+    ],
+    "nodes_retrieved": 35,
+    "edges_retrieved": 32,
+    "chunks_retrieved": 0,
+    "total_candidates": 67,
+    "final_items_count": 8,
+    "citation_count": 7,
+    "retrieval_time_ms": 313.45,
+    "total_elapsed_ms": 313.79,
+    "top_items": [
+      {
+        "title": "Code Entity: routes.py [File]",
+        "type": "ENTITY",
+        "score": 1.4,
+        "graph_score": 1.0,
+        "semantic_score": 0.0,
+        "provenance": {
+          "source_type": "git",
+          "document_id": null,
+          "document_name": null,
+          "page_number": null,
+          "repo_name": "context-lakehouse-age",
+          "file_path": "api/routes.py",
+          "start_line": 1,
+          "end_line": 178,
+          "commit_hash": "969c5064ef0281e33581ec6b5ad4f6d1be34d885",
+          "chunk_id": null,
+          "snippet": ""
+        }
+      },
+      {
+        "title": "Code Entity: a [Module]",
+        "type": "ENTITY",
+        "score": 1.4,
+        "graph_score": 1.0,
+        "semantic_score": 0.0,
+        "provenance": {
+          "source_type": "git",
+          "document_id": null,
+          "document_name": null,
+          "page_number": null,
+          "repo_name": "context-lakehouse-age",
+          "file_path": "api/app.py",
+          "start_line": 1,
+          "end_line": 31,
+          "commit_hash": "969c5064ef0281e33581ec6b5ad4f6d1be34d885",
+          "chunk_id": null,
+          "snippet": "FastAPI Application Entry Point ==============================="
+        }
+      },
+      {
+        "title": "Code Entity: routes [Module]",
+        "type": "ENTITY",
+        "score": 1.4,
+        "graph_score": 1.0,
+        "semantic_score": 0.0,
+        "provenance": {
+          "source_type": "git",
+          "document_id": null,
+          "document_name": null,
+          "page_number": null,
+          "repo_name": "context-lakehouse-age",
+          "file_path": "api/routes.py",
+          "start_line": 1,
+          "end_line": 178,
+          "commit_hash": "969c5064ef0281e33581ec6b5ad4f6d1be34d885",
+          "chunk_id": null,
+          "snippet": "REST API Router for PDF Context Lakehouse & Apache AGE Knowledge Graph ======================================================================"
+        }
+      }
+    ],
+    "context_preview": "# Context Retrieval: Show me the API endpoints.\n\n## \ud83c\udfaf Query Analysis\n- **Intent**: `API_ROUTES`\n- **Extracted Entities**: `API`\n- **Keywords**: api, endpoints\n\n\n## \ud83d\udd78\ufe0f Knowledge Graph Entities & Nodes\n\n### Code Entity: routes.py [File]\n**Symbol**: `routes.py` (File)\n**Canonical ID**: `repo:context-la..."
+  },
+  {
+    "id": 5,
+    "category": "Database connection query (Repo)",
+    "query": "How does the application connect to the database?",
+    "scope": {
+      "repo_name": "context-lakehouse-age",
+      "document_id": null
+    },
+    "intent": "SCHEMA",
+    "keywords": [
+      "application",
+      "connect",
+      "database"
+    ],
+    "detected_targets": [],
+    "extracted_entities": [],
+    "nodes_retrieved": 8,
+    "edges_retrieved": 14,
+    "chunks_retrieved": 0,
+    "total_candidates": 22,
+    "final_items_count": 8,
+    "citation_count": 8,
+    "retrieval_time_ms": 479.07,
+    "total_elapsed_ms": 479.12,
+    "top_items": [
+      {
+        "title": "Code Entity: Settings [Class]",
+        "type": "ENTITY",
+        "score": 1.32,
+        "graph_score": 1.0,
+        "semantic_score": 0.0,
+        "provenance": {
+          "source_type": "git",
+          "document_id": null,
+          "document_name": null,
+          "page_number": null,
+          "repo_name": "context-lakehouse-age",
+          "file_path": "config.py",
+          "start_line": 9,
+          "end_line": 39,
+          "commit_hash": "969c5064ef0281e33581ec6b5ad4f6d1be34d885",
+          "chunk_id": null,
+          "snippet": "class Settings(BaseModel):     # App     APP_NAME: str = \"Context Lakehouse & Knowledge Graph Pipeline\"     APP_VERSION: str = \"1.0.0\"     DEBUG: bool = Field(default=True)          # PostgreSQL & Apache AGE     POSTGRES_HOST: str = Field(default_factory=lambda: os.getenv(\"POSTGRES_HOST\", \"localhost\"))     POSTGRES_PORT: int = Field(default_factory=lambda: int(os.getenv(\"POSTGRES_PORT\", \"5455\")))"
+        }
+      },
+      {
+        "title": "Code Entity: health_check [Function]",
+        "type": "ENTITY",
+        "score": 1.12,
+        "graph_score": 1.0,
+        "semantic_score": 0.0,
+        "provenance": {
+          "source_type": "git",
+          "document_id": null,
+          "document_name": null,
+          "page_number": null,
+          "repo_name": "context-lakehouse-age",
+          "file_path": "api/routes.py",
+          "start_line": 170,
+          "end_line": 178,
+          "commit_hash": "969c5064ef0281e33581ec6b5ad4f6d1be34d885",
+          "chunk_id": null,
+          "snippet": "def health_check():     db_health = pipeline.graph_service.age_client.test_connection()     doc_count = len(pipeline.storage.list_documents())     return {         \"status\": \"ok\",         \"database\": db_health,         \"lakehouse_documents\": doc_count,         \"storage_root\": str(pipeline.storage.root_dir)     }"
+        }
+      },
+      {
+        "title": "Code Entity: LakehouseLayer [Class]",
+        "type": "ENTITY",
+        "score": 1.12,
+        "graph_score": 1.0,
+        "semantic_score": 0.0,
+        "provenance": {
+          "source_type": "git",
+          "document_id": null,
+          "document_name": null,
+          "page_number": null,
+          "repo_name": "context-lakehouse-age",
+          "file_path": "storage/models.py",
+          "start_line": 50,
+          "end_line": 65,
+          "commit_hash": "969c5064ef0281e33581ec6b5ad4f6d1be34d885",
+          "chunk_id": null,
+          "snippet": "class LakehouseLayer(str, Enum):     \"\"\"     Explicit architectural lakehouse tiers:     - RAW: Unmodified binary assets (PDFs)     - METADATA: Catalog and lifecycle tracking     - EXTRACTED_PAGES: Cleaned page-level text extraction     - CHUNKS: Token/character bounded passage chunks with provenance     - CONTEXT: Structured semantic context (entities & relationships)     - GRAPH_SYNC: Sync logs"
+        }
+      }
+    ],
+    "context_preview": "# Context Retrieval: How does the application connect to the database?\n\n## \ud83c\udfaf Query Analysis\n- **Intent**: `SCHEMA`\n- **Keywords**: application, connect, database\n\n\n## \ud83d\udd78\ufe0f Knowledge Graph Entities & Nodes\n\n### Code Entity: Settings [Class]\n**Symbol**: `Settings` (Class)\n**Canonical ID**: `repo:context..."
+  },
+  {
+    "id": 6,
+    "category": "Exact known entity query (Repo)",
+    "query": "How does AgeClient execute Cypher queries in age_client.py?",
+    "scope": {
+      "repo_name": "context-lakehouse-age",
+      "document_id": null
+    },
+    "intent": "SCHEMA",
+    "keywords": [
+      "ageclient",
+      "execute",
+      "cypher",
+      "queries",
+      "age_client",
+      "py"
+    ],
+    "detected_targets": [
+      "age_client.py",
+      "age_client"
+    ],
+    "extracted_entities": [
+      "AgeClient"
+    ],
+    "nodes_retrieved": 57,
+    "edges_retrieved": 32,
+    "chunks_retrieved": 0,
+    "total_candidates": 89,
+    "final_items_count": 8,
+    "citation_count": 8,
+    "retrieval_time_ms": 612.21,
+    "total_elapsed_ms": 612.36,
+    "top_items": [
+      {
+        "title": "Code Entity: execute_cypher [Method]",
+        "type": "ENTITY",
+        "score": 1.56,
+        "graph_score": 1.0,
+        "semantic_score": 0.0,
+        "provenance": {
+          "source_type": "git",
+          "document_id": null,
+          "document_name": null,
+          "page_number": null,
+          "repo_name": "context-lakehouse-age",
+          "file_path": "graph/age_client.py",
+          "start_line": 72,
+          "end_line": 117,
+          "commit_hash": "969c5064ef0281e33581ec6b5ad4f6d1be34d885",
+          "chunk_id": null,
+          "snippet": "def execute_cypher(         self,         cypher_query: str,         columns: Optional[List[str]] = None,         graph_name: Optional[str] = None     ) -> List[Dict[str, Any]]:         \"\"\"         Execute a Cypher query against Apache AGE.         `cypher_query` is the Cypher snippet (e.g. MATCH (n) RETURN n).         `columns` defines the alias names returned in the AS (...) clause.         \"\"\""
+        }
+      },
+      {
+        "title": "Code Entity: age_client.py [File]",
+        "type": "ENTITY",
+        "score": 1.42,
+        "graph_score": 1.0,
+        "semantic_score": 0.0,
+        "provenance": {
+          "source_type": "git",
+          "document_id": null,
+          "document_name": null,
+          "page_number": null,
+          "repo_name": "context-lakehouse-age",
+          "file_path": "graph/age_client.py",
+          "start_line": 1,
+          "end_line": 162,
+          "commit_hash": "969c5064ef0281e33581ec6b5ad4f6d1be34d885",
+          "chunk_id": null,
+          "snippet": ""
+        }
+      },
+      {
+        "title": "Code Entity: AGEClient [Class]",
+        "type": "ENTITY",
+        "score": 1.42,
+        "graph_score": 1.0,
+        "semantic_score": 0.0,
+        "provenance": {
+          "source_type": "git",
+          "document_id": null,
+          "document_name": null,
+          "page_number": null,
+          "repo_name": "context-lakehouse-age",
+          "file_path": "graph/age_client.py",
+          "start_line": 18,
+          "end_line": 162,
+          "commit_hash": "969c5064ef0281e33581ec6b5ad4f6d1be34d885",
+          "chunk_id": null,
+          "snippet": "class AGEClient:     def __init__(         self,         host: Optional[str] = None,         port: Optional[int] = None,         dbname: Optional[str] = None,         user: Optional[str] = None,         password: Optional[str] = None,         graph_name: Optional[str] = None     ):         self.host = host or settings.POSTGRES_HOST         self.port = port or settings.POSTGRES_PORT         self.db"
+        }
+      }
+    ],
+    "context_preview": "# Context Retrieval: How does AgeClient execute Cypher queries in age_client.py?\n\n## \ud83c\udfaf Query Analysis\n- **Intent**: `SCHEMA`\n- **Extracted Entities**: `AgeClient`\n- **Target Symbols/Files**: `age_client.py`, `age_client`\n- **Keywords**: ageclient, execute, cypher, queries, age_client, py\n\n\n## \ud83d\udd78\ufe0f Kno..."
+  },
+  {
+    "id": 7,
+    "category": "Unrelated / Out-of-domain query",
+    "query": "Quantum teleportation in outer space astrophysics",
+    "scope": {
+      "repo_name": null,
+      "document_id": null
+    },
+    "intent": "GENERAL",
+    "keywords": [
+      "quantum",
+      "teleportation",
+      "outer",
+      "space",
+      "astrophysics"
+    ],
+    "detected_targets": [],
+    "extracted_entities": [],
+    "nodes_retrieved": 0,
+    "edges_retrieved": 0,
+    "chunks_retrieved": 0,
+    "total_candidates": 0,
+    "final_items_count": 0,
+    "citation_count": 0,
+    "retrieval_time_ms": 1070.33,
+    "total_elapsed_ms": 1070.39,
+    "top_items": [],
+    "context_preview": "# Context Retrieval: Quantum teleportation in outer space astrophysics\n\n*No relevant context items found in Knowledge Graph or Lakehouse for this query.*"
+  }
+]
