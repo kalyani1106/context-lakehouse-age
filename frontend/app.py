@@ -70,40 +70,166 @@ insights_service = get_insights_service()
 export_service = get_export_service()
 context_engine = get_context_engine()
 
-# Custom CSS for modern styling
+from frontend.utils import get_file_icon, get_status_indicator, get_intent_badge, format_bytes
+
+# Custom CSS for enterprise dark theme styling
 st.markdown("""
 <style>
+    /* Global Typography & Palette */
+    :root {
+        --bg-base: #0B0F19;
+        --card-bg: #0F172A;
+        --card-border: #1E293B;
+        --card-border-hover: #38BDF8;
+        --accent-primary: #38BDF8;
+        --accent-indigo: #6366F1;
+        --accent-success: #10B981;
+        --text-primary: #F8FAFC;
+        --text-secondary: #94A3B8;
+    }
+
+    /* Platform Header */
+    .platform-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(56, 189, 248, 0.1);
+        border: 1px solid rgba(56, 189, 248, 0.3);
+        color: #38BDF8;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
     .main-header {
-        font-size: 2.2rem;
+        font-size: 2.35rem;
         font-weight: 800;
-        background: linear-gradient(90deg, #3B82F6 0%, #8B5CF6 100%);
+        background: linear-gradient(90deg, #38BDF8 0%, #818CF8 50%, #C084FC 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        margin-bottom: 0.2rem;
+        margin-bottom: 0.3rem;
+        letter-spacing: -0.02em;
+        line-height: 1.2;
     }
     .sub-header {
-        font-size: 1rem;
+        font-size: 1.02rem;
         color: #94A3B8;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1.4rem;
+        line-height: 1.55;
+        max-width: 950px;
     }
+
+    /* KPI Metric Cards */
     .stat-card {
-        background: #1E293B;
+        background: linear-gradient(145deg, #0F172A 0%, #1E293B 100%);
         border: 1px solid #334155;
-        border-radius: 10px;
-        padding: 16px;
+        border-radius: 12px;
+        padding: 16px 18px;
         text-align: center;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+    .stat-card:hover {
+        transform: translateY(-2px);
+        border-color: #38BDF8;
+        box-shadow: 0 6px 18px rgba(56, 189, 248, 0.12);
+    }
+    .stat-icon {
+        font-size: 1.35rem;
+        margin-bottom: 2px;
     }
     .stat-number {
-        font-size: 1.8rem;
-        font-weight: 700;
+        font-size: 1.85rem;
+        font-weight: 800;
         color: #38BDF8;
+        line-height: 1.15;
     }
     .stat-label {
-        font-size: 0.85rem;
+        font-size: 0.8rem;
         color: #94A3B8;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.06em;
+        font-weight: 600;
+        margin-top: 4px;
     }
+
+    /* Streamlit Tabs Navigation */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+        background-color: #0F172A;
+        padding: 8px 12px;
+        border-radius: 10px;
+        border: 1px solid #1E293B;
+    }
+    .stTabs [data-baseweb="tab"] {
+        height: 42px;
+        border-radius: 8px;
+        padding: 0 16px;
+        color: #94A3B8;
+        font-weight: 600;
+        font-size: 13.5px;
+        border: none;
+        transition: all 0.2s ease;
+    }
+    .stTabs [data-baseweb="tab"]:hover {
+        color: #F8FAFC;
+        background: #1E293B;
+    }
+    .stTabs [aria-selected="true"] {
+        background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%) !important;
+        color: #38BDF8 !important;
+        border: 1px solid #38BDF8 !important;
+        box-shadow: 0 2px 8px rgba(56, 189, 248, 0.15) !important;
+    }
+
+    /* Sidebar Status & Section Styling */
+    .sidebar-status-card-connected {
+        background: rgba(6, 78, 59, 0.4);
+        border: 1px solid #10B981;
+        border-radius: 8px;
+        padding: 12px 14px;
+        margin-bottom: 14px;
+    }
+    .sidebar-status-card-error {
+        background: rgba(127, 29, 29, 0.4);
+        border: 1px solid #EF4444;
+        border-radius: 8px;
+        padding: 12px 14px;
+        margin-bottom: 14px;
+    }
+    .sidebar-section-header {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #38BDF8;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin: 16px 0 8px 0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .sidebar-meta-box {
+        background: #0F172A;
+        border: 1px solid #1E293B;
+        border-radius: 8px;
+        padding: 10px 12px;
+        margin-bottom: 10px;
+        font-size: 0.82rem;
+    }
+    .arch-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 8px;
+        font-size: 0.82rem;
+        color: #CBD5E1;
+        line-height: 1.4;
+    }
+
+    /* Cards & Badges */
     .insight-card {
         background: #0F172A;
         border: 1px solid #1E293B;
@@ -111,51 +237,156 @@ st.markdown("""
         padding: 14px 18px;
         margin-bottom: 12px;
     }
-    .badge-git {
-        background: #4F46E5;
-        color: #FFFFFF;
-        padding: 4px 10px;
-        border-radius: 6px;
-        font-weight: 600;
-        font-size: 12px;
+    .format-category-card {
+        background: #0F172A;
+        border: 1px solid #1E293B;
+        border-radius: 8px;
+        padding: 12px 14px;
+        height: 100%;
+        box-sizing: border-box;
+        transition: border-color 0.2s;
     }
-    .badge-http-get { background: #0284C7; color: white; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; }
-    .badge-http-post { background: #059669; color: white; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; }
-    .badge-http-delete { background: #DC2626; color: white; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; }
-    .badge-http-put { background: #D97706; color: white; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; }
+    .format-category-card:hover {
+        border-color: #38BDF8;
+    }
+    .format-category-title {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #38BDF8;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .format-badge-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    .format-badge {
+        background: #1E293B;
+        border: 1px solid #334155;
+        border-radius: 6px;
+        padding: 3px 8px;
+        font-size: 11px;
+        font-weight: 600;
+        color: #F1F5F9;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .file-preview-card {
+        background: #0F172A;
+        border: 1px solid #38BDF8;
+        border-radius: 10px;
+        padding: 16px 20px;
+        margin: 16px 0;
+        box-shadow: 0 4px 16px rgba(56, 189, 248, 0.08);
+    }
+    .file-preview-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #F8FAFC;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .file-preview-meta {
+        color: #94A3B8;
+        font-size: 0.85rem;
+        margin-top: 4px;
+    }
+    .status-pill-ready {
+        background: #0C4A6E;
+        border: 1px solid #0284C7;
+        color: #38BDF8;
+        font-weight: 600;
+        padding: 4px 12px;
+        border-radius: 14px;
+        font-size: 0.8rem;
+    }
+    .download-card {
+        background: #0F172A;
+        border: 1px solid #1E293B;
+        border-radius: 10px;
+        padding: 14px;
+        text-align: center;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        box-sizing: border-box;
+        transition: all 0.2s ease;
+    }
+    .download-card:hover {
+        border-color: #38BDF8;
+        transform: translateY(-2px);
+    }
+    .download-card-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #F8FAFC;
+        margin-bottom: 4px;
+    }
+    .download-card-desc {
+        font-size: 0.78rem;
+        color: #94A3B8;
+        margin-bottom: 12px;
+    }
 </style>
 """, unsafe_allow_html=True)
 
 # Sidebar
 with st.sidebar:
     st.image("https://raw.githubusercontent.com/apache/age/master/img/age-logo.png", width=160)
-    st.markdown("### ⚙️ System Status")
+    st.markdown("<div style='color:#94A3B8; font-size:12px; font-weight:600; margin-top:-6px; margin-bottom:14px;'>Knowledge Graph Intelligence • Apache AGE</div>", unsafe_allow_html=True)
     
+    st.markdown('<div class="sidebar-section-header">⚙️ System Status</div>', unsafe_allow_html=True)
     try:
         health = pdf_pipeline.graph_service.age_client.test_connection()
-        st.success(f"🟢 **PostgreSQL + AGE Connected**\n\nHost: `{health['host']}:{health['port']}`\n\nDatabase: `{health.get('current_graph', 'postgres')}`")
+        st.markdown(f"""
+        <div class="sidebar-status-card-connected">
+            <div style="font-weight:700; color:#34D399; font-size:13px;">🟢 PostgreSQL + AGE</div>
+            <div style="color:#A7F3D0; font-size:11.5px; margin-top:2px;"><b>Connected & Ready</b></div>
+            <div style="color:#6EE7B7; font-size:11px; margin-top:6px; font-family:monospace;">Host: {health['host']}:{health['port']}</div>
+            <div style="color:#6EE7B7; font-size:11px; font-family:monospace;">Database: {health.get('current_graph', 'postgres')}</div>
+        </div>
+        """, unsafe_allow_html=True)
     except Exception as e:
-        st.error(f"🔴 **AGE Connection Error**: {e}")
+        st.markdown(f"""
+        <div class="sidebar-status-card-error">
+            <div style="font-weight:700; color:#F87171; font-size:13px;">🔴 PostgreSQL + AGE</div>
+            <div style="color:#FECACA; font-size:11.5px; margin-top:2px;"><b>Disconnected</b></div>
+            <div style="color:#FCA5A5; font-size:11px; margin-top:4px;">{str(e)[:60]}...</div>
+        </div>
+        """, unsafe_allow_html=True)
 
-    st.markdown("---")
-    st.markdown("### 🕸️ Graph Graphs")
-    st.caption(f"📁 PDF Graph: `{pdf_pipeline.graph_service.graph_name}`")
-    st.caption(f"🐙 Git Graph: `{git_pipeline.graph_service.graph_name}`")
+    st.markdown('<div class="sidebar-section-header">🕸️ Knowledge Graphs</div>', unsafe_allow_html=True)
+    st.markdown(f"""
+    <div class="sidebar-meta-box">
+        <div style="color:#CBD5E1; margin-bottom:4px;">📄 <b>Document Graph:</b> <code style="color:#38BDF8;">{pdf_pipeline.graph_service.graph_name}</code></div>
+        <div style="color:#CBD5E1;">🐙 <b>Git Graph:</b> <code style="color:#38BDF8;">{git_pipeline.graph_service.graph_name}</code></div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    st.markdown("---")
-    st.markdown("### 📚 Architecture")
+    st.markdown('<div class="sidebar-section-header">📚 Architecture</div>', unsafe_allow_html=True)
     st.markdown("""
-    - **Git Graphify**: AST code analysis, imports, configs & docs → Apache AGE
-    - **Insights Engine**: Deterministic topology, tech stack & call graph summaries
-    - **Export Engine**: JSON, CSV, ZIP, GraphML formats
-    - **PDF Lakehouse**: Raw Tier, Chunks, Extraction → Apache AGE
-    - **Provenance Engine**: Exact line numbers & snippets
-    - **Query Layer**: openCypher via Apache AGE
-    """)
+    <div style="background:#0F172A; border:1px solid #1E293B; border-radius:8px; padding:12px 14px;">
+        <div class="arch-item"><span>🐙</span><div><b>Git Graphify</b><br><span style="font-size:11px; color:#94A3B8;">AST code analysis, imports, configs & docs</span></div></div>
+        <div class="arch-item"><span>🧠</span><div><b>Context Engine</b><br><span style="font-size:11px; color:#94A3B8;">Hybrid graph & lexical multi-modal retrieval</span></div></div>
+        <div class="arch-item"><span>💡</span><div><b>Insights Engine</b><br><span style="font-size:11px; color:#94A3B8;">Deterministic topology, stack & call graphs</span></div></div>
+        <div class="arch-item"><span>📦</span><div><b>Export Engine</b><br><span style="font-size:11px; color:#94A3B8;">JSON, CSV, ZIP, GraphML & JPG bundles</span></div></div>
+        <div class="arch-item"><span>🌊</span><div><b>Lakehouse Tiers</b><br><span style="font-size:11px; color:#94A3B8;">Raw Tier, Chunking & Line Provenance</span></div></div>
+        <div class="arch-item"><span>⚡</span><div><b>openCypher Engine</b><br><span style="font-size:11px; color:#94A3B8;">Graph queries via Apache AGE</span></div></div>
+    </div>
+    """, unsafe_allow_html=True)
 
 # Header
-st.markdown('<div class="main-header">Git Graphify & Context Lakehouse ➔ Apache AGE</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-header">Automated knowledge graph generation from Git source repositories and PDF documents with deterministic AST parsing and complete provenance.</div>', unsafe_allow_html=True)
+st.markdown('<div class="platform-badge">🕸️ APACHE AGE GRAPH INTELLIGENCE • CONTEXT LAKEHOUSE</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-header">🧠 Context Lakehouse & Git Graphify</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-header">Transform Git source repositories and multi-format documents into structured, queryable knowledge graphs with deterministic AST parsing, BM25 chunking, and complete provenance.</div>', unsafe_allow_html=True)
 
 # Top Metrics Row
 git_stats = git_pipeline.graph_service.get_graph_stats()
@@ -165,20 +396,20 @@ pdf_docs = pdf_pipeline.storage.list_documents()
 
 col1, col2, col3, col4 = st.columns(4)
 with col1:
-    st.markdown(f'<div class="stat-card"><div class="stat-number">{len(git_repos)}</div><div class="stat-label">Analyzed Git Repos</div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="stat-card"><div class="stat-icon">🐙</div><div class="stat-number">{len(git_repos)}</div><div class="stat-label">Analyzed Git Repos</div></div>', unsafe_allow_html=True)
 with col2:
-    st.markdown(f'<div class="stat-card"><div class="stat-number">{git_stats.get("total_nodes", 0)}</div><div class="stat-label">Git Graph Vertices</div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="stat-card"><div class="stat-icon">🕸️</div><div class="stat-number">{git_stats.get("total_nodes", 0)}</div><div class="stat-label">Git Graph Vertices</div></div>', unsafe_allow_html=True)
 with col3:
-    st.markdown(f'<div class="stat-card"><div class="stat-number">{git_stats.get("total_edges", 0)}</div><div class="stat-label">Git Graph Edges</div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="stat-card"><div class="stat-icon">🔗</div><div class="stat-number">{git_stats.get("total_edges", 0)}</div><div class="stat-label">Git Graph Edges</div></div>', unsafe_allow_html=True)
 with col4:
-    st.markdown(f'<div class="stat-card"><div class="stat-number">{len(pdf_docs)}</div><div class="stat-label">Lakehouse Documents</div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="stat-card"><div class="stat-icon">📚</div><div class="stat-number">{len(pdf_docs)}</div><div class="stat-label">Lakehouse Documents</div></div>', unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
 # Main Navigation Tabs
 tab_git, tab_pdf_ingest, tab_pdf_context, tab_context_engine, tab_graph, tab_cypher = st.tabs([
     "🐙 1. Git Graphify",
-    "📄 2. Lakehouse Ingestion",
+    "📂 2. Lakehouse Ingestion",
     "📊 3. Structured Context Explorer",
     "🧠 4. Context Engine",
     "🕸️ 5. Apache AGE Graph Visualizer",
@@ -605,6 +836,14 @@ with tab_git:
             clean_repo_name = selected_git_repo.replace(" ", "_").replace("/", "_")
 
             with d_col1:
+                st.markdown("""
+                <div class="download-card">
+                    <div>
+                        <div class="download-card-title">📥 JSON</div>
+                        <div class="download-card-desc">Full graph data & line provenance</div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
                 st.download_button(
                     label="📥 Download JSON",
                     data=json_str,
@@ -616,6 +855,14 @@ with tab_git:
                 st.caption(f"📄 Full JSON ({json_export_data['metadata']['total_vertices']} nodes, {json_export_data['metadata']['total_edges']} edges)")
 
             with d_col2:
+                st.markdown("""
+                <div class="download-card">
+                    <div>
+                        <div class="download-card-title">📊 CSVs (ZIP)</div>
+                        <div class="download-card-desc">Nodes & edges relational bundle</div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
                 st.download_button(
                     label="📊 Download CSVs (ZIP)",
                     data=zip_bytes,
@@ -627,6 +874,14 @@ with tab_git:
                 st.caption("📑 `vertices.csv` & `edges.csv`")
 
             with d_col3:
+                st.markdown("""
+                <div class="download-card">
+                    <div>
+                        <div class="download-card-title">📦 ZIP Archive</div>
+                        <div class="download-card-desc">Complete multi-format bundle</div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
                 st.download_button(
                     label="📦 Download ZIP Archive",
                     data=zip_bytes,
@@ -638,8 +893,16 @@ with tab_git:
                 st.caption("📦 Complete dataset archive")
 
             with d_col4:
+                st.markdown("""
+                <div class="download-card">
+                    <div>
+                        <div class="download-card-title">🌐 GraphML</div>
+                        <div class="download-card-desc">XML format for Gephi & Cytoscape</div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
                 st.download_button(
-                    label="🌐 Download GraphML (XML)",
+                    label="🌐 Download GraphML",
                     data=graphml_str,
                     file_name=f"{clean_repo_name}_knowledge_graph.graphml",
                     mime="application/xml",
@@ -649,8 +912,16 @@ with tab_git:
                 st.caption("🌐 Compatible with Gephi & Cytoscape")
 
             with d_col5:
+                st.markdown("""
+                <div class="download-card">
+                    <div>
+                        <div class="download-card-title">🖼️ JPG Image</div>
+                        <div class="download-card-desc">High-resolution graph rendering</div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
                 st.download_button(
-                    label="🖼️ Download Knowledge Graph (JPG)",
+                    label="🖼️ Download JPG",
                     data=jpg_bytes,
                     file_name=f"{clean_repo_name}_knowledge_graph.jpg",
                     mime="image/jpeg",
@@ -705,124 +976,195 @@ with tab_git:
 
 # ----------------- TAB 2: Multi-Format Lakehouse Ingestion -----------------
 with tab_pdf_ingest:
-    st.markdown("### 📂 Upload Document / Data File to Lakehouse")
-    st.caption("Select a file format, upload your document or dataset, and ingest into structured Lakehouse tiers with automatic Apache AGE property graph generation.")
+    st.markdown("### 📂 Upload Files to Lakehouse")
+    st.markdown("<div style='color:#94A3B8; font-size:14px; margin-bottom:16px;'>Upload documents or datasets for extraction, normalization and Knowledge Graph processing into structured Lakehouse tiers.</div>", unsafe_allow_html=True)
 
     # Format definitions and metadata
     FORMAT_CONFIG = {
-        "All Supported Formats": {
+        "🌟 All Supported Formats (Universal Ingestion)": {
             "extensions": ["pdf", "docx", "txt", "md", "markdown", "csv", "tsv", "xlsx", "xls", "json", "jsonl", "ndjson", "xml", "html", "htm", "parquet", "feather", "arrow", "yaml", "yml", "sql", "rtf"],
             "description": "Universal ingestion • Ingest documents, tabular data, spreadsheets, and analytics datasets",
-            "badge": "All Formats"
+            "badge": "All Formats",
+            "icon": "🌟"
         },
-        "PDF (.pdf)": {
+        "📕 PDF (.pdf)": {
             "extensions": ["pdf"],
             "description": "Document format • Page-level text, headers, and semantic entity extraction",
-            "badge": "PDF"
+            "badge": "PDF",
+            "icon": "📕"
         },
-        "DOCX (.docx)": {
+        "📝 DOCX (.docx)": {
             "extensions": ["docx"],
             "description": "Word document • Paragraphs, headings, and structured table extraction",
-            "badge": "DOCX"
+            "badge": "DOCX",
+            "icon": "📝"
         },
-        "TXT (.txt)": {
+        "📄 TXT (.txt)": {
             "extensions": ["txt", "text"],
             "description": "Plain text • Unstructured text and document passage extraction",
-            "badge": "TXT"
+            "badge": "TXT",
+            "icon": "📄"
         },
-        "Markdown (.md)": {
+        "📝 Markdown (.md)": {
             "extensions": ["md", "markdown"],
             "description": "Markdown document • Section headers, lists, and formatted text",
-            "badge": "Markdown"
+            "badge": "Markdown",
+            "icon": "📝"
         },
-        "CSV (.csv)": {
+        "📊 CSV (.csv)": {
             "extensions": ["csv"],
             "description": "Structured tabular data • Columns, inferred data types, and record samples",
-            "badge": "CSV"
+            "badge": "CSV",
+            "icon": "📊"
         },
-        "TSV (.tsv)": {
+        "📊 TSV (.tsv)": {
             "extensions": ["tsv"],
             "description": "Tab-separated values • Delimited columns, schema types, and records",
-            "badge": "TSV"
+            "badge": "TSV",
+            "icon": "📊"
         },
-        "Excel (.xlsx, .xls)": {
+        "📗 Excel (.xlsx, .xls)": {
             "extensions": ["xlsx", "xls"],
             "description": "Spreadsheet workbook • Multi-sheet extraction, column schemas, and rows",
-            "badge": "Excel"
+            "badge": "Excel",
+            "icon": "📗"
         },
-        "JSON (.json)": {
+        "🔢 JSON (.json)": {
             "extensions": ["json"],
             "description": "Structured hierarchical data • Key-value trees, nested schemas, and fields",
-            "badge": "JSON"
+            "badge": "JSON",
+            "icon": "🔢"
         },
-        "JSONL / NDJSON (.jsonl, .ndjson)": {
+        "🔢 JSONL / NDJSON (.jsonl, .ndjson)": {
             "extensions": ["jsonl", "ndjson"],
             "description": "Newline-delimited JSON • Line-by-line record parsing and schema extraction",
-            "badge": "JSONL"
+            "badge": "JSONL",
+            "icon": "🔢"
         },
-        "XML (.xml)": {
+        "🧩 XML (.xml)": {
             "extensions": ["xml"],
             "description": "Hierarchical markup • Element tag hierarchy, attributes, and text nodes",
-            "badge": "XML"
+            "badge": "XML",
+            "icon": "🧩"
         },
-        "HTML (.html, .htm)": {
+        "🌐 HTML (.html, .htm)": {
             "extensions": ["html", "htm"],
             "description": "Web document • Clean DOM text, headings, and structured tables",
-            "badge": "HTML"
+            "badge": "HTML",
+            "icon": "🌐"
         },
-        "Parquet (.parquet)": {
+        "⚡ Parquet (.parquet)": {
             "extensions": ["parquet", "pq"],
             "description": "Columnar analytics dataset • PyArrow schema, data types, and records",
-            "badge": "Parquet"
+            "badge": "Parquet",
+            "icon": "⚡"
         },
-        "Feather (.feather)": {
+        "🪶 Feather (.feather)": {
             "extensions": ["feather", "arrow"],
             "description": "Arrow IPC binary table • Column definitions and record batches",
-            "badge": "Feather"
+            "badge": "Feather",
+            "icon": "🪶"
         },
-        "YAML (.yaml, .yml)": {
+        "⚙️ YAML (.yaml, .yml)": {
             "extensions": ["yaml", "yml"],
             "description": "Configuration markup • Mappings, keys, and structured hierarchy",
-            "badge": "YAML"
+            "badge": "YAML",
+            "icon": "⚙️"
         },
-        "SQL (.sql)": {
+        "🗄️ SQL (.sql)": {
             "extensions": ["sql"],
             "description": "SQL queries and DDL • Table definitions, statements, and schemas",
-            "badge": "SQL"
+            "badge": "SQL",
+            "icon": "🗄️"
         },
-        "RTF (.rtf)": {
+        "📄 RTF (.rtf)": {
             "extensions": ["rtf"],
             "description": "Rich text format • Formatted text extraction and document passages",
-            "badge": "RTF"
+            "badge": "RTF",
+            "icon": "📄"
         }
     }
 
     col_fmt, col_desc = st.columns([1, 2])
     with col_fmt:
         selected_fmt = st.selectbox(
-            "Select File Type:",
+            "Target File Format:",
             options=list(FORMAT_CONFIG.keys()),
             index=0,
             key="lakehouse_format_selector",
-            help="Filter upload validation to specific format or select 'All Supported Formats' for universal ingestion."
+            help="Filter upload validation to a specific format or choose Universal Ingestion."
         )
     with col_desc:
         current_cfg = FORMAT_CONFIG[selected_fmt]
         st.markdown(f"""
         <div class="insight-card" style="margin-top: 24px; padding: 10px 16px;">
-            <span style="color: #38BDF8; font-weight: 600;">{current_cfg['badge']}</span> • <span style="color: #94A3B8; font-size: 13px;">{current_cfg['description']}</span>
+            <span style="color: #38BDF8; font-weight: 600;">{current_cfg['icon']} {current_cfg['badge']}</span> • <span style="color: #94A3B8; font-size: 13px;">{current_cfg['description']}</span>
         </div>
         """, unsafe_allow_html=True)
 
     allowed_types = current_cfg["extensions"]
     uploaded_file = st.file_uploader(
-        f"Select or drag & drop a {selected_fmt} file (Max: 200 MB)",
+        "Drag & drop files here or click Browse files",
         type=allowed_types,
         key="lakehouse_file_uploader",
-        help=f"Accepts: {', '.join(['.' + ext for ext in allowed_types])}"
+        help=f"Supported extensions: {', '.join(['.' + ext for ext in allowed_types])}"
     )
 
-    st.caption("Supported formats: **PDF • DOCX • TXT • MD • CSV • TSV • XLSX • XLS • JSON • JSONL • XML • HTML • Parquet • Feather • YAML • SQL • RTF** • Maximum file size: **200 MB**")
+    # Visually separated format category cards
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("#### 📦 Supported Formats by Category")
+    cat1, cat2, cat3, cat4 = st.columns(4)
+    with cat1:
+        st.markdown("""
+        <div class="format-category-card">
+            <div class="format-category-title">📄 Documents</div>
+            <div class="format-badge-grid">
+                <span class="format-badge">📕 PDF</span>
+                <span class="format-badge">📝 DOCX</span>
+                <span class="format-badge">📄 TXT</span>
+                <span class="format-badge">📝 MD</span>
+                <span class="format-badge">🌐 HTML</span>
+                <span class="format-badge">🧩 XML</span>
+                <span class="format-badge">📄 RTF</span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    with cat2:
+        st.markdown("""
+        <div class="format-category-card">
+            <div class="format-category-title">📊 Structured Data</div>
+            <div class="format-badge-grid">
+                <span class="format-badge">📊 CSV</span>
+                <span class="format-badge">📊 TSV</span>
+                <span class="format-badge">🔢 JSON</span>
+                <span class="format-badge">🔢 JSONL</span>
+                <span class="format-badge">⚙️ YAML</span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    with cat3:
+        st.markdown("""
+        <div class="format-category-card">
+            <div class="format-category-title">📗 Spreadsheets</div>
+            <div class="format-badge-grid">
+                <span class="format-badge">📗 XLSX</span>
+                <span class="format-badge">📗 XLS</span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    with cat4:
+        st.markdown("""
+        <div class="format-category-card">
+            <div class="format-category-title">⚡ Analytics & Code</div>
+            <div class="format-badge-grid">
+                <span class="format-badge">⚡ Parquet</span>
+                <span class="format-badge">🪶 Feather</span>
+                <span class="format-badge">🗄️ SQL</span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.caption("🔒 **Maximum file size:** 200 MB per file • Deterministic SHA-256 deduplication and line-level provenance enabled.")
 
     if uploaded_file is not None:
         file_ext = Path(uploaded_file.name).suffix.lower().lstrip(".")
@@ -833,16 +1175,35 @@ with tab_pdf_ingest:
             file_size_kb = round(len(file_bytes) / 1024, 1)
             file_size_mb = round(file_size_kb / 1024, 2)
             size_display = f"{file_size_mb} MB ({file_size_kb:,} KB)" if file_size_mb >= 1.0 else f"{file_size_kb:,} KB"
+            f_icon = get_file_icon(uploaded_file.name)
 
-            st.markdown("---")
-            st.markdown("#### 📄 File Ready for Ingestion")
-            c_info1, c_info2, c_info3 = st.columns(3)
-            with c_info1:
-                st.markdown(f"**Filename:** `{uploaded_file.name}`")
-            with c_info2:
-                st.markdown(f"**Type:** `{current_cfg['badge']}` (`.{file_ext}`)")
-            with c_info3:
-                st.markdown(f"**Size:** `{size_display}`")
+            # Detect format category using FileDetector if available
+            try:
+                from backend.extraction.file_detector import FileDetector
+                fmt, mime, cat = FileDetector.detect_format(uploaded_file.name, file_bytes)
+                cat_display = cat.value.capitalize()
+                fmt_display = fmt.value.upper()
+            except Exception:
+                cat_display = "Document / Dataset"
+                fmt_display = file_ext.upper()
+
+            st.markdown(f"""
+            <div class="file-preview-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <div class="file-preview-title">
+                            <span>{f_icon}</span> <span>{uploaded_file.name}</span>
+                        </div>
+                        <div class="file-preview-meta">
+                            <b>Format:</b> {fmt_display} • <b>Category:</b> {cat_display} • <b>Size:</b> {size_display}
+                        </div>
+                    </div>
+                    <div>
+                        <span class="status-pill-ready">⚪ Ready for Ingestion</span>
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
 
             if st.button("🚀 Upload & Ingest into Lakehouse", type="primary", use_container_width=True):
                 with st.spinner("Calculating SHA-256 and registering in Lakehouse tiers..."):
@@ -854,7 +1215,7 @@ with tab_pdf_ingest:
                         st.error(f"❌ Upload failed: {e}")
 
     st.markdown("---")
-    st.subheader("Lakehouse Document Catalog")
+    st.subheader("📚 Lakehouse Document Catalog")
 
     if not pdf_docs:
         st.info("No documents uploaded yet.")
@@ -863,6 +1224,7 @@ with tab_pdf_ingest:
         for d in pdf_docs:
             fname = d.document_name.lower()
             custom = d.custom_metadata or {}
+            f_icon = get_file_icon(d.document_name)
             
             if "sheet_count" in custom:
                 metric_str = f"{custom['sheet_count']} sheets"
@@ -883,18 +1245,18 @@ with tab_pdf_ingest:
 
             doc_table.append({
                 "Document ID": d.document_id,
-                "Filename": d.document_name,
+                "Filename": f"{f_icon} {d.document_name}",
                 "File Type": d.file_type or "application/octet-stream",
                 "Size (KB)": round(d.file_size_bytes / 1024, 1),
                 "Pages / Sheets / Records": metric_str,
                 "Entities": d.total_entities if d.total_entities is not None else "-",
                 "Relations": d.total_relationships if d.total_relationships is not None else "-",
-                "Status": d.status.value
+                "Status": get_status_indicator(d.status.value)
             })
         st.dataframe(pd.DataFrame(doc_table), use_container_width=True)
 
-        st.markdown("### Process Document Through Pipeline")
-        doc_options = {f"{d.document_name} ({d.document_id}) [{d.status.value}]": d.document_id for d in pdf_docs}
+        st.markdown("### ⚙️ Process Document Through Pipeline")
+        doc_options = {f"{get_file_icon(d.document_name)} {d.document_name} ({d.document_id}) [{get_status_indicator(d.status.value)}]": d.document_id for d in pdf_docs}
         selected_label = st.selectbox("Select document to process:", options=list(doc_options.keys()))
         selected_doc_id = doc_options[selected_label]
         
@@ -913,7 +1275,7 @@ with tab_pdf_context:
     if not pdf_docs:
         st.info("No documents in Lakehouse.")
     else:
-        pdf_dict = {f"{d.document_name} ({d.document_id})": d.document_id for d in pdf_docs}
+        pdf_dict = {f"{get_file_icon(d.document_name)} {d.document_name} ({d.document_id})": d.document_id for d in pdf_docs}
         active_doc_label = st.selectbox("Select document:", options=list(pdf_dict.keys()), key="pdf_context_doc_sel")
         active_doc_id = pdf_dict[active_doc_label]
         
@@ -926,9 +1288,10 @@ with tab_pdf_context:
 # ----------------- TAB 4: Context Engine -----------------
 with tab_context_engine:
     st.markdown("## 🧠 Intelligent Context Engine")
-    st.markdown("Query the hybrid intelligence layer bridging **Apache AGE Knowledge Graphs** and **Context Lakehouse Storage**. Deterministically analyzes queries, traverses graph topology, scores passages with BM25, ranks with multi-factor weighting, and generates token-budgeted context with line-level provenance.")
+    st.markdown("<div style='color:#94A3B8; font-size:14px; margin-bottom:16px;'>Query the hybrid intelligence layer bridging <b>Apache AGE Knowledge Graphs</b> and <b>Context Lakehouse Storage</b>. Deterministically analyzes queries, traverses graph topology, scores passages with BM25, ranks with multi-factor weighting, and generates token-budgeted context with complete line provenance.</div>", unsafe_allow_html=True)
 
-    # Target Scope Selection
+    # 1. Query Configuration
+    st.markdown("### ⚙️ Query Configuration")
     scope_col1, scope_col2 = st.columns([1, 2])
     with scope_col1:
         target_scope_type = st.selectbox(
@@ -950,7 +1313,7 @@ with tab_context_engine:
                 st.info("No Git repositories analyzed yet. (Analyze in Tab 1)")
         elif target_scope_type == "Specific Lakehouse Document":
             if pdf_docs:
-                doc_map = {f"{d.document_name} ({d.document_id})": d for d in pdf_docs}
+                doc_map = {f"{get_file_icon(d.document_name)} {d.document_name} ({d.document_id})": d for d in pdf_docs}
                 sel_doc_label = st.selectbox("Select Target Document:", options=list(doc_map.keys()), key="ce_doc_sel")
                 sel_doc_obj = doc_map[sel_doc_label]
                 scoped_doc_name = sel_doc_obj.document_name
@@ -958,8 +1321,8 @@ with tab_context_engine:
             else:
                 st.info("No documents in Lakehouse yet. (Upload in Tab 2)")
 
-    # Quick Example Prompts
-    st.markdown("**💡 Quick Query Templates:**")
+    # 2. Quick Queries
+    st.markdown("### 💡 Quick Queries")
     q_col1, q_col2, q_col3, q_col4, q_col5 = st.columns(5)
     
     default_prompt = "How does authentication and token verification work in this codebase?"
@@ -982,16 +1345,18 @@ with tab_context_engine:
         st.session_state["ce_query_input"] = "Describe the data flow from ingestion to chunking and Apache AGE graph storage."
         st.rerun()
 
-    # Query Input
+    # 3. Query
+    st.markdown("### 💬 Query")
     query_text = st.text_area(
         "Natural Language Query / Prompt for Context Engine:",
         value=st.session_state.get("ce_query_input", default_prompt),
-        height=90,
-        key="ce_active_query_text"
+        height=95,
+        key="ce_active_query_text",
+        help="Enter any architectural, dependency, schema, or code question to retrieve grounded context."
     )
 
-    # Retrieval & Ranking Parameters Expander
-    with st.expander("⚙️ Advanced Retrieval & Ranking Parameters", expanded=False):
+    # 4. Advanced Retrieval
+    with st.expander("⚙️ Advanced Retrieval Parameters", expanded=False):
         c_mode, c_topk, c_tokens, c_depth = st.columns(4)
         with c_mode:
             mode_choice = st.selectbox(
@@ -1016,8 +1381,8 @@ with tab_context_engine:
         with w_col3:
             p_weight = st.slider("Provenance Completeness Weight:", 0.0, 1.0, 0.2, 0.05)
 
-    # Execution Button
-    if st.button("🚀 Retrieve & Assemble Context", type="primary", use_container_width=True):
+    # 5. Action
+    if st.button("🔍 Retrieve & Assemble Context", type="primary", use_container_width=True):
         if not query_text.strip():
             st.warning("Please enter a query.")
         else:
@@ -1049,27 +1414,29 @@ with tab_context_engine:
         # 1. Query Analysis Banner
         qa = resp.query_analysis
         st.markdown("### 🎯 Query Understanding & Intent")
+        
+        intent_display = get_intent_badge(qa.intent.value)
         qa_col1, qa_col2, qa_col3 = st.columns([1, 2, 2])
         with qa_col1:
-            st.markdown(f"**Intent**: `{qa.intent.value}`")
+            st.markdown(f"**Intent:**<br><span style='display:inline-block; background:#1E293B; border:1px solid #38BDF8; color:#38BDF8; font-weight:700; padding:4px 10px; border-radius:6px; font-size:12px; margin-top:4px;'>{intent_display}</span>", unsafe_allow_html=True)
         with qa_col2:
-            entities_str = ", ".join([f"`{e}`" for e in qa.extracted_entities]) if qa.extracted_entities else "*None detected*"
-            st.markdown(f"**Entities**: {entities_str}")
+            entities_str = " ".join([f"<span class='format-badge'>🏷️ {e}</span>" for e in qa.extracted_entities]) if qa.extracted_entities else "<i style='color:#94A3B8;'>None detected</i>"
+            st.markdown(f"**Extracted Entities:**<br><div style='margin-top:4px;'>{entities_str}</div>", unsafe_allow_html=True)
         with qa_col3:
-            targets_str = ", ".join([f"`{t}`" for t in qa.detected_targets]) if qa.detected_targets else "*None detected*"
-            st.markdown(f"**Target Symbols/Files**: {targets_str}")
+            targets_str = " ".join([f"<span class='format-badge'>🎯 {t}</span>" for t in qa.detected_targets]) if qa.detected_targets else "<i style='color:#94A3B8;'>None detected</i>"
+            st.markdown(f"**Target Symbols / Files:**<br><div style='margin-top:4px;'>{targets_str}</div>", unsafe_allow_html=True)
 
         # 2. Retrieval Metrics KPI
         st.markdown("<br>", unsafe_allow_html=True)
         m_col1, m_col2, m_col3, m_col4 = st.columns(4)
         with m_col1:
-            st.markdown(f'<div class="stat-card"><div class="stat-number">{resp.stats.retrieval_time_ms:.1f} ms</div><div class="stat-label">Retrieval Latency</div></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="stat-card"><div class="stat-icon">⏱️</div><div class="stat-number">{resp.stats.retrieval_time_ms:.1f} ms</div><div class="stat-label">Retrieval Latency</div></div>', unsafe_allow_html=True)
         with m_col2:
-            st.markdown(f'<div class="stat-card"><div class="stat-number">{resp.stats.nodes_retrieved + resp.stats.edges_retrieved}</div><div class="stat-label">Graph Items (Nodes+Edges)</div></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="stat-card"><div class="stat-icon">🕸️</div><div class="stat-number">{resp.stats.nodes_retrieved + resp.stats.edges_retrieved}</div><div class="stat-label">Graph Items (Nodes+Edges)</div></div>', unsafe_allow_html=True)
         with m_col3:
-            st.markdown(f'<div class="stat-card"><div class="stat-number">{resp.stats.chunks_retrieved}</div><div class="stat-label">Lakehouse Chunks</div></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="stat-card"><div class="stat-icon">📄</div><div class="stat-number">{resp.stats.chunks_retrieved}</div><div class="stat-label">Lakehouse Chunks</div></div>', unsafe_allow_html=True)
         with m_col4:
-            st.markdown(f'<div class="stat-card"><div class="stat-number">{resp.stats.total_tokens_estimated}</div><div class="stat-label">Assembled Tokens</div></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="stat-card"><div class="stat-icon">🔢</div><div class="stat-number">{resp.stats.total_tokens_estimated}</div><div class="stat-label">Assembled Tokens</div></div>', unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
 
@@ -1199,7 +1566,7 @@ with tab_graph:
             st.info("No Git repositories analyzed yet. Analyze a repository in Tab 1.")
             graph_data = {"nodes": [], "edges": []}
     elif graph_target == "Document / Dataset Subgraph" and pdf_docs:
-        sub_doc_options = {f"{d.document_name} ({d.document_id})": d.document_id for d in pdf_docs if d.status == ProcessingStatus.COMPLETED}
+        sub_doc_options = {f"{get_file_icon(d.document_name)} {d.document_name} ({d.document_id})": d.document_id for d in pdf_docs if d.status == ProcessingStatus.COMPLETED}
         if sub_doc_options:
             selected_sub_label = st.selectbox("Select Document / Dataset Subgraph:", options=list(sub_doc_options.keys()))
             graph_data = pdf_pipeline.graph_service.get_document_subgraph(sub_doc_options[selected_sub_label])

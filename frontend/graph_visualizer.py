@@ -211,7 +211,7 @@ def render_visjs_graph(graph_data: Dict[str, Any], height: str = "680px", debug:
                 height: 100%;
                 min-height: {height};
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-                background-color: #0F172A;
+                background-color: #0B0F19;
                 color: #F8FAFC;
                 overflow: hidden;
             }}
@@ -227,107 +227,124 @@ def render_visjs_graph(graph_data: Dict[str, Any], height: str = "680px", debug:
                 width: 100%;
                 height: 100%;
                 min-height: {height};
-                background: #0F172A radial-gradient(#1E293B 1px, transparent 1px);
-                background-size: 20px 20px;
+                background: #0B0F19 radial-gradient(#1E293B 1px, transparent 1px);
+                background-size: 24px 24px;
                 position: relative;
             }}
             #provenance-panel {{
-                width: 380px;
+                width: 390px;
                 height: 100%;
-                background: #1E293B;
-                border-left: 1px solid #334155;
-                padding: 16px;
+                background: #0F172A;
+                border-left: 1px solid #1E293B;
+                padding: 18px 20px;
                 overflow-y: auto;
                 font-size: 13px;
                 flex-shrink: 0;
+                box-shadow: -4px 0 16px rgba(0, 0, 0, 0.3);
+            }}
+            #provenance-panel::-webkit-scrollbar {{
+                width: 6px;
+            }}
+            #provenance-panel::-webkit-scrollbar-thumb {{
+                background: #334155;
+                border-radius: 3px;
             }}
             .badge {{
                 display: inline-block;
                 padding: 4px 10px;
                 border-radius: 6px;
                 font-size: 11px;
-                font-weight: 600;
+                font-weight: 700;
                 background: #3B82F6;
                 color: #FFFFFF;
-                margin-bottom: 8px;
+                letter-spacing: 0.03em;
             }}
             .method-badge {{
                 display: inline-block;
                 padding: 3px 8px;
                 border-radius: 4px;
                 font-size: 10px;
-                font-weight: 600;
-                background: #059669;
-                color: #FFFFFF;
+                font-weight: 700;
+                background: #065F46;
+                border: 1px solid #10B981;
+                color: #34D399;
                 margin-left: 6px;
                 text-transform: uppercase;
+                letter-spacing: 0.04em;
             }}
             .panel-title {{
                 font-size: 16px;
                 font-weight: 700;
-                margin: 0 0 8px 0;
+                margin: 6px 0 10px 0;
                 color: #38BDF8;
                 word-break: break-word;
+                line-height: 1.3;
             }}
             .field-label {{
                 font-size: 11px;
                 text-transform: uppercase;
-                letter-spacing: 0.05em;
+                letter-spacing: 0.06em;
                 color: #94A3B8;
-                margin-top: 10px;
-                margin-bottom: 2px;
+                margin-top: 12px;
+                margin-bottom: 3px;
                 font-weight: 600;
             }}
             .field-value {{
                 color: #E2E8F0;
-                line-height: 1.4;
+                line-height: 1.45;
                 word-break: break-word;
             }}
             .code-box {{
-                background: #0A0F1D;
+                background: #050811;
+                border: 1px solid #1E293B;
                 border-left: 3px solid #8B5CF6;
-                padding: 8px 10px;
-                border-radius: 4px;
-                margin-top: 4px;
-                font-family: "Fira Code", Consolas, monospace;
+                padding: 10px 12px;
+                border-radius: 6px;
+                margin-top: 6px;
+                font-family: "Fira Code", "SFMono-Regular", Consolas, monospace;
                 font-size: 12px;
                 color: #E2E8F0;
-                line-height: 1.4;
-                max-height: 200px;
+                line-height: 1.45;
+                max-height: 220px;
                 overflow-y: auto;
                 white-space: pre-wrap;
             }}
             .quote-box {{
-                background: #0F172A;
+                background: #050811;
+                border: 1px solid #1E293B;
                 border-left: 3px solid #38BDF8;
-                padding: 8px 10px;
-                border-radius: 4px;
-                margin-top: 4px;
+                padding: 10px 12px;
+                border-radius: 6px;
+                margin-top: 6px;
                 font-style: italic;
                 color: #CBD5E1;
-                line-height: 1.4;
-                max-height: 160px;
+                line-height: 1.45;
+                max-height: 180px;
                 overflow-y: auto;
             }}
             .legend {{
                 position: absolute;
-                bottom: 12px;
-                left: 12px;
-                background: rgba(30, 41, 59, 0.92);
+                bottom: 14px;
+                left: 14px;
+                background: rgba(15, 23, 42, 0.94);
+                backdrop-filter: blur(8px);
                 border: 1px solid #334155;
                 border-radius: 8px;
-                padding: 8px 12px;
+                padding: 8px 14px;
                 display: flex;
                 gap: 12px;
                 flex-wrap: wrap;
                 font-size: 11px;
                 pointer-events: none;
                 z-index: 10;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
             }}
             .legend-item {{
                 display: flex;
                 align-items: center;
                 gap: 6px;
+                color: #CBD5E1;
+                font-weight: 500;
             }}
             .legend-dot {{
                 width: 10px;
@@ -340,6 +357,7 @@ def render_visjs_graph(graph_data: Dict[str, Any], height: str = "680px", debug:
                 top: 12px;
                 left: 12px;
                 background: #7F1D1D;
+                border: 1px solid #DC2626;
                 color: #FECACA;
                 padding: 10px 14px;
                 border-radius: 6px;
@@ -355,12 +373,16 @@ def render_visjs_graph(graph_data: Dict[str, Any], height: str = "680px", debug:
             <div id="network"></div>
             <div id="provenance-panel">
                 <div id="panel-content">
-                    <h4 style="margin-top:0; color:#38BDF8;">🔍 Node Provenance Inspector</h4>
-                    <p style="color:#94A3B8; line-height:1.5;">Click any entity node or relationship edge in the graph to inspect its exact repository source, file path, line numbers, and source code snippet.</p>
-                    <hr style="border:0; border-top:1px solid #334155; margin:16px 0;">
-                    <div style="font-size:12px; color:#64748B;">
-                        <div><b>Total Vertices:</b> {len(vis_nodes)}</div>
-                        <div><b>Total Edges:</b> {len(vis_edges)}</div>
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                        <span style="font-size:16px;">🔍</span>
+                        <h4 style="margin:0; color:#38BDF8; font-size:15px; font-weight:700;">Node Provenance Inspector</h4>
+                    </div>
+                    <p style="color:#94A3B8; line-height:1.5; font-size:12px; margin-bottom:14px;">Click any entity node or relationship edge in the graph to inspect its exact repository source, file path, line numbers, and source code snippet.</p>
+                    <hr style="border:0; border-top:1px solid #1E293B; margin:14px 0;">
+                    <div style="font-size:12px; color:#64748B; background:#0B0F19; border:1px solid #1E293B; border-radius:6px; padding:10px 12px; display:flex; justify-content:space-around;">
+                        <div><b>Vertices:</b> <span style="color:#38BDF8;">{len(vis_nodes)}</span></div>
+                        <div style="border-left:1px solid #334155;"></div>
+                        <div><b>Edges:</b> <span style="color:#38BDF8;">{len(vis_edges)}</span></div>
                     </div>
                 </div>
             </div>
